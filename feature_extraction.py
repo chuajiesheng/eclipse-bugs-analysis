@@ -15,9 +15,9 @@ class LongDesc:
     thetext = None
 
     def __init__(self, item):
-        self.who = item.getElementsByTagName('who')
-        self.bug_when = item.getElementsByTagName('bug_when')
-        self.thetext = item.getElementsByTagName('thetext')
+        self.who = item.getElementsByTagName('who')[0].firstChild.nodeValue
+        self.bug_when = item.getElementsByTagName('bug_when')[0].firstChild.nodeValue
+        self.thetext = item.getElementsByTagName('thetext')[0].firstChild.nodeValue
 
 
 class Bug:
