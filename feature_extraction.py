@@ -52,7 +52,6 @@ class Bug:
             return None
 
         self.bug_id = item.getElementsByTagName('bug_id')[0].firstChild.nodeValue
-        print 'processing', self.bug_id
 
         if len(item.attributes) > 0 and 'error' in item.attributes.keys():
             error = item.attributes['error']
