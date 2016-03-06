@@ -4,6 +4,8 @@ from xml.dom import minidom
 from xml import parsers
 import code
 import threading
+from dateutil.parser import parse
+import datetime
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
 bugs = []
@@ -32,6 +34,12 @@ class LongDesc:
 
 
 class Bug:
+    FIELDS = ['bug_id', 'creation_ts', 'short_desc', 'delta_ts', 'reporter_accessible', 'cclist_accessible',
+              'classification_id', 'classification', 'product', 'component', 'version', 'rep_platform', 'op_sys',
+              'bug_status', 'resolution', 'priority', 'bug_severity', 'target_milestone', 'blocked', 'dependson',
+              'everconfirmed', 'reporter', 'assigned_to', 'cc', 'qa_contact', 'long_des']
+    CSV_STRING = '{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'
+
     bug_id = None
     creation_ts = None
     short_desc = None
@@ -50,6 +58,7 @@ class Bug:
     priority = None
     bug_severity = None
     target_milestone = None
+    blocked = []
     dependson = []
     everconfirmed = None
     reporter = None
@@ -70,7 +79,7 @@ class Bug:
             if error is not None and (error.value == 'NotFound' or error.value == 'NotPermitted'):
                 return None
 
-        self.creation_ts = NodeUtil.getText(item.getElementsByTagName('creation_ts')[0].childNodes)
+        self.creation_ts = parse(NodeUtil.getText(item.getElementsByTagName('creation_ts')[0].childNodes))
 
         short_desc_element = item.getElementsByTagName('short_desc')
         if short_desc_element is not None and len(short_desc_element) > 0:
@@ -96,6 +105,12 @@ class Bug:
         self.bug_severity = NodeUtil.getText(item.getElementsByTagName('bug_severity')[0].childNodes)
         self.target_milestone = NodeUtil.getText(item.getElementsByTagName('target_milestone')[0].childNodes)
 
+        blocked_elements = item.getElementsByTagName('blocked')
+        self.blocked = []
+        if blocked_elements is not None and len(blocked_elements) > 0:
+            for blocked_element in blocked_elements:
+                self.blocked.append(NodeUtil.getText(blocked_element.childNodes))
+
         dependson_elements = item.getElementsByTagName('dependson')
         self.dependson = []
         if dependson_elements is not None and len(dependson_elements) > 0:
@@ -120,6 +135,62 @@ class Bug:
         for desc in item.getElementsByTagName('long_desc'):
             self.long_desc.append(LongDesc(desc))
 
+    def format_cc(self):
+        return len(self.cc)
+
+    def format_blocked(self):
+        return len(self.blocked)
+
+    def format_dependson(self):
+        return len(self.dependson)
+
+    def format_long_desc(self):
+        length = len(self.long_desc)
+        all_bug_when_values = [parse(ld.bug_when) for ld in self.long_desc]
+        all_bug_when_values.sort()
+
+        longest_gap = all_bug_when_values[len(all_bug_when_values) - 1] - self.creation_ts
+        total_gap = 0
+        for bug_when in all_bug_when_values:
+            total_gap += (bug_when - self.creation_ts).total_seconds()
+
+        average_gap = total_gap / len(all_bug_when_values)
+
+        return '{},{},{},{},'.format(length, total_gap, average_gap, longest_gap)
+
+    def csv_title(self):
+        fields = self.FIELDS
+        fields.extend(['total_gap', 'average_gap', 'longest_gap'])
+        return fields.join(', ')
+
+    def to_csv(self):
+        return self.CSV_STRING.format(self.bug_id,
+                        self.creation_ts,
+                        self.short_desc,
+                        self.delta_ts,
+                        self.reporter_accessible,
+                        self.cclist_accessible,
+                        self.classification_id,
+                        self.classification,
+                        self.product,
+                        self.component,
+                        self.version,
+                        self.rep_platform,
+                        self.op_sys,
+                        self.bug_status,
+                        self.resolution,
+                        self.priority,
+                        self.bug_severity,
+                        self.target_milestone,
+                        self.format_blocked(),
+                        self.format_dependson(),
+                        self.everconfirmed,
+                        self.reporter,
+                        self.assigned_to,
+                        self.format_cc(),
+                        self.qa_contact,
+                        self.format_long_desc())
+
 
 def parse_file(file_path):
     xmldoc = None
@@ -134,13 +205,16 @@ def parse_file(file_path):
     for item in itemlist:
         bug = Bug(item)
         bugs.append(bug)
+        print bug.to_csv()
+
+
+def check_file(file):
+    file_path = join(DATA_DIRECTORY, file)
+    t = threading.Thread(target=parse_file, args=(file_path,))
+    t.start()
+
 
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
     for f in files:
-        file_path = join(DATA_DIRECTORY, f)
-        t = threading.Thread(target=parse_file, args=(file_path,))
-        t.start()
-
-
-
+        check_file(f)
