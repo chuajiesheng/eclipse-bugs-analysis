@@ -6,6 +6,7 @@ import code
 import threading
 from dateutil.parser import parse
 import datetime
+import string
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
 bugs = []
@@ -38,7 +39,7 @@ class Bug:
               'classification_id', 'classification', 'product', 'component', 'version', 'rep_platform', 'op_sys',
               'bug_status', 'resolution', 'priority', 'bug_severity', 'target_milestone', 'blocked', 'dependson',
               'everconfirmed', 'reporter', 'assigned_to', 'cc', 'qa_contact', 'long_des']
-    CSV_STRING = '{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'
+    CSV_STRING = "'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}'"
 
     bug_id = None
     creation_ts = None
@@ -146,27 +147,39 @@ class Bug:
 
     def format_long_desc(self):
         length = len(self.long_desc)
+        if length == 0:
+            return "'{}','{}','{}','{}',".format(length, 0, 0, 0)
+
         all_bug_when_values = [parse(ld.bug_when) for ld in self.long_desc]
         all_bug_when_values.sort()
 
-        longest_gap = all_bug_when_values[len(all_bug_when_values) - 1] - self.creation_ts
+        longest_gap = (all_bug_when_values[-1] - self.creation_ts).total_seconds()
         total_gap = 0
         for bug_when in all_bug_when_values:
             total_gap += (bug_when - self.creation_ts).total_seconds()
 
         average_gap = total_gap / len(all_bug_when_values)
 
-        return '{},{},{},{},'.format(length, total_gap, average_gap, longest_gap)
+        str = "'{}','{}','{}','{}',".format(length, total_gap, average_gap, longest_gap)
+        return str
 
     def csv_title(self):
         fields = self.FIELDS
         fields.extend(['total_gap', 'average_gap', 'longest_gap'])
         return fields.join(', ')
 
+    @staticmethod
+    def clean_string(str):
+        if str is None:
+            return ''
+
+        printable = set(string.printable)
+        return filter(lambda s: s in printable, str)
+
     def to_csv(self):
         return self.CSV_STRING.format(self.bug_id,
                         self.creation_ts,
-                        self.short_desc,
+                        self.clean_string(self.short_desc),
                         self.delta_ts,
                         self.reporter_accessible,
                         self.cclist_accessible,
@@ -204,12 +217,11 @@ def parse_file(file_path):
     itemlist = xmldoc.getElementsByTagName('bug')
     for item in itemlist:
         bug = Bug(item)
-        bugs.append(bug)
+        # bugs.append(bug)
         print bug.to_csv()
 
 
-def check_file(file):
-    file_path = join(DATA_DIRECTORY, file)
+def multithread_parse_file(file_path):
     t = threading.Thread(target=parse_file, args=(file_path,))
     t.start()
 
@@ -217,4 +229,5 @@ def check_file(file):
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
     for f in files:
-        check_file(f)
+        file_path = join(DATA_DIRECTORY, f)
+        parse_file(file_path)
