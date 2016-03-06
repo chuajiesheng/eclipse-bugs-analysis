@@ -39,6 +39,7 @@ class Bug:
     priority = None
     bug_severity = None
     target_milestone = None
+    dependson = []
     everconfirmed = None
     reporter = None
     assigned_to = None
@@ -83,6 +84,13 @@ class Bug:
         self.priority = item.getElementsByTagName('priority')[0].firstChild.nodeValue
         self.bug_severity = item.getElementsByTagName('bug_severity')[0].firstChild.nodeValue
         self.target_milestone = item.getElementsByTagName('target_milestone')[0].firstChild.nodeValue
+
+        dependson_elements = item.getElementsByTagName('dependson')
+        self.dependson = []
+        if dependson_elements is not None and len(dependson_elements) > 0:
+            for dependson_element in dependson_elements:
+                self.dependson.append(dependson_element.firstChild.nodeValue)
+
         self.everconfirmed = item.getElementsByTagName('everconfirmed')[0].firstChild.nodeValue
         self.reporter = item.getElementsByTagName('reporter')[0].firstChild.nodeValue
         self.assigned_to = item.getElementsByTagName('assigned_to')[0].firstChild.nodeValue
