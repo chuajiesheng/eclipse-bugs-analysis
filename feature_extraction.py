@@ -174,7 +174,7 @@ class Bug:
             return ''
 
         printable = set(string.printable)
-        return filter(lambda s: s in printable, str)
+        return filter(lambda s: s in printable, str).replace(',', ';')
 
     def to_csv(self):
         creation_ts_strftime = self.creation_ts.strftime('%Y-%m-%d %H:%M:%S') if self.creation_ts is not None else None
