@@ -8,6 +8,15 @@ import threading
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
 bugs = []
 
+class NodeUtil:
+    @staticmethod
+    def getText(nodelist):
+        rc = []
+        for node in nodelist:
+            if node.nodeType == node.TEXT_NODE:
+                rc.append(node.data)
+        return ''.join(rc)
+
 
 class LongDesc:
     who = None
@@ -15,9 +24,11 @@ class LongDesc:
     thetext = None
 
     def __init__(self, item):
-        self.who = item.getElementsByTagName('who')[0].firstChild.nodeValue
-        self.bug_when = item.getElementsByTagName('bug_when')[0].firstChild.nodeValue
-        self.thetext = item.getElementsByTagName('thetext')[0].firstChild.nodeValue
+        self.who = NodeUtil.getText(item.getElementsByTagName('who')[0].childNodes)
+        self.bug_when = NodeUtil.getText(item.getElementsByTagName('bug_when')[0].childNodes)
+
+        thetext_element = item.getElementsByTagName('thetext')
+        self.thetext = NodeUtil.getText(thetext_element[0].childNodes)
 
 
 class Bug:
@@ -52,58 +63,58 @@ class Bug:
         if item is None:
             return None
 
-        self.bug_id = item.getElementsByTagName('bug_id')[0].firstChild.nodeValue
+        self.bug_id = NodeUtil.getText(item.getElementsByTagName('bug_id')[0].childNodes)
 
         if len(item.attributes) > 0 and 'error' in item.attributes.keys():
             error = item.attributes['error']
             if error is not None and (error.value == 'NotFound' or error.value == 'NotPermitted'):
                 return None
 
-        self.creation_ts = item.getElementsByTagName('creation_ts')[0].firstChild.nodeValue
+        self.creation_ts = NodeUtil.getText(item.getElementsByTagName('creation_ts')[0].childNodes)
 
         short_desc_element = item.getElementsByTagName('short_desc')
         if short_desc_element is not None and len(short_desc_element) > 0:
-            self.short_desc = short_desc_element[0].firstChild.nodeValue
+            self.short_desc = NodeUtil.getText(short_desc_element[0].childNodes)
 
-        self.delta_ts = item.getElementsByTagName('delta_ts')[0].firstChild.nodeValue
-        self.reporter_accessible = item.getElementsByTagName('reporter_accessible')[0].firstChild.nodeValue
-        self.cclist_accessible = item.getElementsByTagName('cclist_accessible')[0].firstChild.nodeValue
-        self.classification_id = item.getElementsByTagName('classification_id')[0].firstChild.nodeValue
-        self.classification = item.getElementsByTagName('classification')[0].firstChild.nodeValue
-        self.product = item.getElementsByTagName('product')[0].firstChild.nodeValue
-        self.component = item.getElementsByTagName('component')[0].firstChild.nodeValue
-        self.version = item.getElementsByTagName('version')[0].firstChild.nodeValue
-        self.rep_platform = item.getElementsByTagName('rep_platform')[0].firstChild.nodeValue
-        self.op_sys = item.getElementsByTagName('op_sys')[0].firstChild.nodeValue
-        self.bug_status = item.getElementsByTagName('bug_status')[0].firstChild.nodeValue
+        self.delta_ts = NodeUtil.getText(item.getElementsByTagName('delta_ts')[0].childNodes)
+        self.reporter_accessible = NodeUtil.getText(item.getElementsByTagName('reporter_accessible')[0].childNodes)
+        self.cclist_accessible = NodeUtil.getText(item.getElementsByTagName('cclist_accessible')[0].childNodes)
+        self.classification_id = NodeUtil.getText(item.getElementsByTagName('classification_id')[0].childNodes)
+        self.classification = NodeUtil.getText(item.getElementsByTagName('classification')[0].childNodes)
+        self.product = NodeUtil.getText(item.getElementsByTagName('product')[0].childNodes)
+        self.component = NodeUtil.getText(item.getElementsByTagName('component')[0].childNodes)
+        self.version = NodeUtil.getText(item.getElementsByTagName('version')[0].childNodes)
+        self.rep_platform = NodeUtil.getText(item.getElementsByTagName('rep_platform')[0].childNodes)
+        self.op_sys = NodeUtil.getText(item.getElementsByTagName('op_sys')[0].childNodes)
+        self.bug_status = NodeUtil.getText(item.getElementsByTagName('bug_status')[0].childNodes)
 
         resolution_element = item.getElementsByTagName('resolution')
         if resolution_element is not None and len(resolution_element) > 0:
-            self.resolution = resolution_element[0].firstChild.nodeValue
+            self.resolution = NodeUtil.getText(resolution_element[0].childNodes)
 
-        self.priority = item.getElementsByTagName('priority')[0].firstChild.nodeValue
-        self.bug_severity = item.getElementsByTagName('bug_severity')[0].firstChild.nodeValue
-        self.target_milestone = item.getElementsByTagName('target_milestone')[0].firstChild.nodeValue
+        self.priority = NodeUtil.getText(item.getElementsByTagName('priority')[0].childNodes)
+        self.bug_severity = NodeUtil.getText(item.getElementsByTagName('bug_severity')[0].childNodes)
+        self.target_milestone = NodeUtil.getText(item.getElementsByTagName('target_milestone')[0].childNodes)
 
         dependson_elements = item.getElementsByTagName('dependson')
         self.dependson = []
         if dependson_elements is not None and len(dependson_elements) > 0:
             for dependson_element in dependson_elements:
-                self.dependson.append(dependson_element.firstChild.nodeValue)
+                self.dependson.append(NodeUtil.getText(dependson_element.childNodes))
 
-        self.everconfirmed = item.getElementsByTagName('everconfirmed')[0].firstChild.nodeValue
-        self.reporter = item.getElementsByTagName('reporter')[0].firstChild.nodeValue
-        self.assigned_to = item.getElementsByTagName('assigned_to')[0].firstChild.nodeValue
+        self.everconfirmed = NodeUtil.getText(item.getElementsByTagName('everconfirmed')[0].childNodes)
+        self.reporter = NodeUtil.getText(item.getElementsByTagName('reporter')[0].childNodes)
+        self.assigned_to = NodeUtil.getText(item.getElementsByTagName('assigned_to')[0].childNodes)
 
         cc_elements = item.getElementsByTagName('cc')
         if cc_elements is not None and len(cc_elements) > 0:
             self.cc = []
             for cc in cc_elements:
-                self.cc.append(cc.firstChild.nodeValue)
+                self.cc.append(NodeUtil.getText(cc.childNodes))
 
         qa_contact_element = item.getElementsByTagName('qa_contact')
         if qa_contact_element is not None and len(qa_contact_element) > 0:
-            self.qa_contact = qa_contact_element[0].firstChild.nodeValue
+            self.qa_contact = NodeUtil.getText(qa_contact_element[0].childNodes)
 
         self.long_desc = []
         for desc in item.getElementsByTagName('long_desc'):
