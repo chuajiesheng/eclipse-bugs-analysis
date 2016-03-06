@@ -42,6 +42,9 @@ class Bug:
     everconfirmed = None
     reporter = None
     assigned_to = None
+    cc = []
+    qa_contact = None
+
     long_desc = []
 
     def __init__(self, item):
@@ -85,6 +88,17 @@ class Bug:
         self.reporter = item.getElementsByTagName('reporter')[0].firstChild.nodeValue
         self.assigned_to = item.getElementsByTagName('assigned_to')[0].firstChild.nodeValue
 
+        cc_elements = item.getElementsByTagName('cc')
+        if cc_elements is not None and len(cc_elements) > 0:
+            self.cc = []
+            for cc in cc_elements:
+                self.cc.append(cc.firstChild.nodeValue)
+
+        qa_contact_element = item.getElementsByTagName('qa_contact')
+        if qa_contact_element is not None and len(qa_contact_element) > 0:
+            self.qa_contact = qa_contact_element[0].firstChild.nodeValue
+
+        self.long_desc = []
         for desc in item.getElementsByTagName('long_desc'):
             self.long_desc.append(LongDesc(desc))
 
@@ -100,7 +114,8 @@ def parse_file(file_path):
 
     itemlist = xmldoc.getElementsByTagName('bug')
     for item in itemlist:
-        bugs.append(Bug(item))
+        bug = Bug(item)
+        bugs.append(bug)
 
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
