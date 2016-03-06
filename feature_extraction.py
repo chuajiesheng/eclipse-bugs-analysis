@@ -39,7 +39,7 @@ class Bug:
               'classification_id', 'classification', 'product', 'component', 'version', 'rep_platform', 'op_sys',
               'bug_status', 'resolution', 'priority', 'bug_severity', 'target_milestone', 'blocked', 'dependson',
               'everconfirmed', 'reporter', 'assigned_to', 'cc', 'qa_contact', 'long_des']
-    CSV_STRING = "'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}'"
+    CSV_STRING = "{},{},\"{}\",{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}"
 
     bug_id = None
     creation_ts = None
@@ -86,7 +86,7 @@ class Bug:
         if short_desc_element is not None and len(short_desc_element) > 0:
             self.short_desc = NodeUtil.getText(short_desc_element[0].childNodes)
 
-        self.delta_ts = NodeUtil.getText(item.getElementsByTagName('delta_ts')[0].childNodes)
+        self.delta_ts = parse(NodeUtil.getText(item.getElementsByTagName('delta_ts')[0].childNodes))
         self.reporter_accessible = NodeUtil.getText(item.getElementsByTagName('reporter_accessible')[0].childNodes)
         self.cclist_accessible = NodeUtil.getText(item.getElementsByTagName('cclist_accessible')[0].childNodes)
         self.classification_id = NodeUtil.getText(item.getElementsByTagName('classification_id')[0].childNodes)
@@ -148,7 +148,7 @@ class Bug:
     def format_long_desc(self):
         length = len(self.long_desc)
         if length == 0:
-            return "'{}','{}','{}','{}',".format(length, 0, 0, 0)
+            return "{},{},{},{},".format(length, 0, 0, 0)
 
         all_bug_when_values = [parse(ld.bug_when) for ld in self.long_desc]
         all_bug_when_values.sort()
@@ -160,7 +160,7 @@ class Bug:
 
         average_gap = total_gap / len(all_bug_when_values)
 
-        str = "'{}','{}','{}','{}',".format(length, total_gap, average_gap, longest_gap)
+        str = "{},{},{},{},".format(length, total_gap, average_gap, longest_gap)
         return str
 
     def csv_title(self):
@@ -177,32 +177,34 @@ class Bug:
         return filter(lambda s: s in printable, str)
 
     def to_csv(self):
+        creation_ts_strftime = self.creation_ts.strftime('%Y-%m-%d %H:%M:%S') if self.creation_ts is not None else None
+        delta_ts_strftime = self.delta_ts.strftime('%Y-%m-%d %H:%M:%S') if self.delta_ts is not None else None
         return self.CSV_STRING.format(self.bug_id,
-                        self.creation_ts,
-                        self.clean_string(self.short_desc),
-                        self.delta_ts,
-                        self.reporter_accessible,
-                        self.cclist_accessible,
-                        self.classification_id,
-                        self.classification,
-                        self.product,
-                        self.component,
-                        self.version,
-                        self.rep_platform,
-                        self.op_sys,
-                        self.bug_status,
-                        self.resolution,
-                        self.priority,
-                        self.bug_severity,
-                        self.target_milestone,
-                        self.format_blocked(),
-                        self.format_dependson(),
-                        self.everconfirmed,
-                        self.reporter,
-                        self.assigned_to,
-                        self.format_cc(),
-                        self.qa_contact,
-                        self.format_long_desc())
+                                      creation_ts_strftime,
+                                      self.clean_string(self.short_desc),
+                                      delta_ts_strftime,
+                                      self.reporter_accessible,
+                                      self.cclist_accessible,
+                                      self.classification_id,
+                                      self.classification,
+                                      self.product,
+                                      self.component,
+                                      self.version,
+                                      self.rep_platform,
+                                      self.op_sys,
+                                      self.bug_status,
+                                      self.resolution,
+                                      self.priority,
+                                      self.bug_severity,
+                                      self.target_milestone,
+                                      self.format_blocked(),
+                                      self.format_dependson(),
+                                      self.everconfirmed,
+                                      self.reporter,
+                                      self.assigned_to,
+                                      self.format_cc(),
+                                      self.qa_contact,
+                                      self.format_long_desc())
 
 
 def parse_file(file_path):
@@ -217,8 +219,9 @@ def parse_file(file_path):
     itemlist = xmldoc.getElementsByTagName('bug')
     for item in itemlist:
         bug = Bug(item)
-        # bugs.append(bug)
-        print bug.to_csv()
+        if bug is not None:
+            # bugs.append(bug)
+            print bug.to_csv()
 
 
 def multithread_parse_file(file_path):
