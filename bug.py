@@ -366,11 +366,22 @@ class Bug(object):
         return self.OS_SYS[self.op_sys]
 
     # Mean priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
+    mean_priority_of_top20 = None
     # Median priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
+    median_priority_of_top20 = None
     # The same as (i, ii) except only the top 10 bug reports are considered
+    mean_priority_of_top10 = None
+    median_priority_of_top10 = None
     # The same as (i, ii) except only the top 5 bug reports are considered
+    mean_priority_of_top5 = None
+    median_priority_of_top5 = None
     # The same as (i, ii) except only the top 3 bug reports are considered
+    mean_priority_of_top3 = None
+    median_priority_of_top3 = None
     # The same as (i, ii) except only the top 1 bug report is considered
+    mean_priority_of_top1 = None
+    median_priority_of_top1 = None
+
     #
     # # Severity Factor
     # SEV BR's severity field.
