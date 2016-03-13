@@ -34,12 +34,12 @@ class TestBug(unittest.TestCase):
         date3 = datetime.datetime(2000, 10, 15, 9, 10, 10, 10)
         date4 = datetime.datetime(2000, 10, 15, 10, 10, 10, 10)
 
-        bug_creation_dates = [date1, date2, date3, date4]
+        bug_severity_list = [('S1', date1), ('S1', date2), ('S2', date3), ('S1', date4)]
 
         bug = Bug(None)
         bug.creation_ts = datetime.datetime(2000, 10, 10, 10, 10, 10, 10)
 
-        self.assertEqual(bug.num_of_bugs(bug_creation_dates, 5), 3)
+        self.assertEqual(bug.num_of_bugs(bug_severity_list, 5), 3)
 
     def test_num_of_bugs_with_severity(self):
         date1 = datetime.datetime(2000, 10, 10, 10, 10, 10, 10)

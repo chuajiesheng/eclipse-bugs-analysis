@@ -194,12 +194,18 @@ class Bug(object):
         return len(comments)
 
     # Number of bugs reported within 7 days before the reporting of BR
-    def num_of_bugs(self, bug_creation_dates, days):
-        if not isinstance(bug_creation_dates, list):
+    def num_of_bugs(self, bug_severity_list, days):
+        if not isinstance(bug_severity_list, list):
             return 0
 
-        related_bugs = [item for item in bug_creation_dates if self.within_day(item, self.creation_ts, days)]
-        return len(related_bugs)
+        num_of_related_bugs = 0
+        for _, bug_creation_date in bug_severity_list:
+            within_time_period = self.within_day(bug_creation_date, self.creation_ts, days)
+
+            if within_time_period:
+                num_of_related_bugs += 1
+
+        return num_of_related_bugs
 
     # Number of bugs reported with the same severity within 7 days before the reporting of BR
     def num_of_bugs_with_severity(self, bug_severity_list, days):
