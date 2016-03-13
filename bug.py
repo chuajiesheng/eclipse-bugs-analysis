@@ -177,7 +177,7 @@ class Bug(object):
                                       self.format_long_desc())
 
     # # Temporal Factor
-    # KIV - Resolution time of each bug (time difference between delta timestamp and creation timestamp)
+    # Resolution time of each bug (time difference between delta timestamp and creation timestamp)
     # Total time difference between each of the comments in the bug report
     # Mean time difference of the comments in the bug report
     # Number of comments within 5 days from reported date
