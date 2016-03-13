@@ -175,3 +175,58 @@ class Bug(object):
                                       self.format_cc(),
                                       self.qa_contact,
                                       self.format_long_desc())
+
+    # # Temporal Factor
+    # KIV - Resolution time of each bug (time difference between delta timestamp and creation timestamp)
+    # Total time difference between each of the comments in the bug report
+    # Mean time difference of the comments in the bug report
+    # Number of comments within 5 days from reported date
+    @staticmethod
+    def within_day(start, end, num_of_days):
+        ONE_DAY = 60 * 60 * 24
+        return (end - start).total_seconds() < (num_of_days * ONE_DAY)
+
+    def num_of_comments(self, days):
+        comments = [item for item in self.long_desc if self.within_day(self.creation_ts, item.bug_when, days)]
+        return len(comments)
+
+    # Number of bugs reported within 7 days before the reporting of BR
+    # Number of bugs reported with the same severity within 7 days before the reporting of BR
+    # Number of bugs reported with the same or higher severity within 7 days before the reporting of BR
+    # The same as (i, ii, iii) except the time duration is 30 days
+    # The same as (i, ii, iii) except the time duration is 1 day
+    # The same as (i, ii, iii) except the time duration is 3 days
+    #
+    # # Textual Factor
+    # Specific words and phrases from the description field of BR
+    #
+    # # Author Factor
+    # Mean priority of bugs the author fixed
+    # Median priority of bugs the author fixed
+    # Mean priority of all bug reports made by the author of BR prior to the reporting of BR
+    # Median priority of all bug reports made by the author of BR prior to the reporting of BR
+    # The number of bug reports made by the author of BR prior to the reporting of BR
+    #
+    # # Related-Report Factor
+    # Number of comments in the bug report
+    # Operating system
+    # Mean priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
+    # Median priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
+    # The same as (i, ii) except only the top 10 bug reports are considered
+    # The same as (i, ii) except only the top 5 bug reports are considered
+    # The same as (i, ii) except only the top 3 bug reports are considered
+    # The same as (i, ii) except only the top 1 bug report is considered
+    #
+    # # Severity Factor
+    # SEV BR's severity field.
+    #
+    # # Product Factor
+    # BR's product field. This categorical feature is translated into multiple binary features.
+    # Number of bug reports made for the same product as that of BR prior to the reporting of BR
+    # Number of bug reports made for the same product of the same severity as that of BR prior to the reporting of BR
+    # Number of bug reports made for the same product of the same or higher severity as those of BR prior to the # reporting of BR
+    # Proportion of bug reports made for the same product as that of BR prior to the reporting of BR that are assigned # priority P1.
+    # The same as PRO5 except they are for priority (ii, iii, iv, v) respectively.
+    # Mean priority of bug reports made for the same product as that of BR prior to the reporting of BR
+    # Median priority of bug reports made for the same product as that of BR prior to the reporting of BR
+    # The same as (i, ii, iii, iv, v, vi, vii, viii) except they are for the component field of BR.
