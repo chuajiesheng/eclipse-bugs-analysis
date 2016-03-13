@@ -120,7 +120,9 @@ class Bug(object):
         if length == 0:
             return "{},{},{},{},".format(length, 0, 0, 0)
 
-        all_bug_when_values = [parse(ld.bug_when) for ld in self.long_desc]
+        comments = [item for item in self.long_desc if self.within_day(self.creation_ts, parse(item.bug_when), 5)]
+
+        all_bug_when_values = [parse(ld.bug_when) for ld in comments]
         all_bug_when_values.sort()
 
         longest_gap = (all_bug_when_values[-1] - self.creation_ts).total_seconds()
