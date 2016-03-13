@@ -32,7 +32,8 @@ def parse_file(file_path):
         b = bug.Bug(item)
         if b is not None:
             # bugs.append(bug)
-            print b.to_csv()
+            # print b.to_csv()
+            print b.to_short_desc_csv()
 
 
 def multithread_parse_file(file_path):

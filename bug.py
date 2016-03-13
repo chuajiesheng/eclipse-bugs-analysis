@@ -2,6 +2,7 @@ from dateutil.parser import parse
 import string
 from feature_extraction import NodeUtil
 from long_desc import LongDesc
+from nltk.corpus import stopwords
 
 
 class Bug(object):
@@ -63,7 +64,7 @@ class Bug(object):
 
         short_desc_element = item.getElementsByTagName('short_desc')
         if short_desc_element is not None and len(short_desc_element) > 0:
-            self.short_desc = NodeUtil.getText(short_desc_element[0].childNodes)
+            self.short_desc = self.clean_string(NodeUtil.getText(short_desc_element[0].childNodes))
 
         self.delta_ts = parse(NodeUtil.getText(item.getElementsByTagName('delta_ts')[0].childNodes))
         self.reporter_accessible = NodeUtil.getText(item.getElementsByTagName('reporter_accessible')[0].childNodes)
@@ -254,12 +255,22 @@ class Bug(object):
     # The same as (i, ii, iii) except the time duration is 30 days
     # The same as (i, ii, iii) except the time duration is 1 day
     # The same as (i, ii, iii) except the time duration is 3 days
-    #
+
     # # Textual Factor
     # Specific words and phrases from the description field of BR
-    #
+    def short_desc_without_stop_words(self):
+        if self.short_desc is None:
+            return []
+
+        return [word for word in self.short_desc.split(' ') if word not in stopwords.words('english')]
+
+    def to_short_desc_csv(self):
+        words = self.short_desc_without_stop_words()
+        return '{},{}'.format(self.priority, ','.join(words))
+
     # # Author Factor
     # Mean priority of bugs the author fixed
+
     # Median priority of bugs the author fixed
     # Mean priority of all bug reports made by the author of BR prior to the reporting of BR
     # Median priority of all bug reports made by the author of BR prior to the reporting of BR
