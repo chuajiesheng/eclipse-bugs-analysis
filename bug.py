@@ -126,10 +126,9 @@ class Bug(object):
 
     def format_long_desc(self):
         length = len(self.long_desc)
-        if length == 0:
-            return "{},{},{},{},".format(length, 0, 0, 0)
-
         comments = [item for item in self.long_desc if self.within_day(self.creation_ts, parse(item.bug_when), 5)]
+        if len(comments) == 0:
+            return "{},{},{},{},".format(length, 0, 0, 0)
 
         all_bug_when_values = [parse(ld.bug_when) for ld in comments]
         all_bug_when_values.sort()
