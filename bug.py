@@ -23,6 +23,39 @@ class Bug(object):
             'blocker',
         ]
     PRIORITIES = {'P1': 1, 'P2': 2, 'P3': 3, 'P4': 4, 'P5': 5, 'P6': 6}
+    OS_SYS = {
+        'AIX Motif': 1,
+        'All': 2,
+        'HP-UX': 3,
+        'Linux': 4,
+        'Linux-GTK': 5,
+        'Linux-Motif': 6,
+        'Mac OS X': 7,
+        'Neutrino': 8,
+        'None': 9,
+        'other': 10,
+        'Other': 10,
+        'QNX-Photon': 11,
+        'Solaris': 12,
+        'Solaris-GTK': 13,
+        'Solaris-Motif': 14,
+        'SymbianOS-Series 80': 15,
+        'Unix All': 16,
+        'Windows 95': 17,
+        'Windows 98': 18,
+        'Windows 2000': 19,
+        'Windows 2003 Server': 20,
+        'Windows All': 21,
+        'Windows CE': 22,
+        'Windows ME': 23,
+        'Windows Mobile 5.0': 24,
+        'Windows Mobile 2003': 25,
+        'Windows NT': 26,
+        'Windows Vista': 27,
+        'Windows Vista-WPF': 28,
+        'Windows XP': 29
+
+    }
 
     bug_id = None
     creation_ts = None
@@ -323,10 +356,15 @@ class Bug(object):
     def num_of_bug_by_author_prior(self, all_bugs):
         bugs_prior = self.bugs_reported_prior(all_bugs)
         return len(bugs_prior)
-    #
+
     # # Related-Report Factor
-    # Number of comments in the bug report
     # Operating system
+    def os(self):
+        if self.op_sys is None:
+            return 9
+
+        return self.OS_SYS[self.op_sys]
+
     # Mean priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
     # Median priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
     # The same as (i, ii) except only the top 10 bug reports are considered
