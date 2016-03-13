@@ -21,8 +21,8 @@ class TestBug(unittest.TestCase):
         long_desc_1 = LongDesc(None)
         long_desc_2 = LongDesc(None)
 
-        long_desc_1.bug_when = datetime.datetime(2000, 10, 15, 9, 10, 10, 10)
-        long_desc_2.bug_when = datetime.datetime(2000, 10, 15, 10, 10, 10, 10)
+        long_desc_1.bug_when = str(datetime.datetime(2000, 10, 15, 9, 10, 10, 10))
+        long_desc_2.bug_when = str(datetime.datetime(2000, 10, 15, 10, 10, 10, 10))
 
         bug.long_desc = [long_desc_1, long_desc_2]
 

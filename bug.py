@@ -187,7 +187,7 @@ class Bug(object):
         return (end - start).total_seconds() < (num_of_days * ONE_DAY)
 
     def num_of_comments(self, days):
-        comments = [item for item in self.long_desc if self.within_day(self.creation_ts, item.bug_when, days)]
+        comments = [item for item in self.long_desc if self.within_day(self.creation_ts, parse(item.bug_when), days)]
         return len(comments)
 
     # Number of bugs reported within 7 days before the reporting of BR
