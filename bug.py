@@ -280,9 +280,11 @@ class Bug(object):
 
         return author_list[self.reporter]
 
-
     # Median priority of bugs the author fixed
     # Mean priority of all bug reports made by the author of BR prior to the reporting of BR
+    def bugs_by_author(self, all_bugs):
+        return [item for item in all_bugs if (self.reporter == item.reporter and self.bug_id != item.bug_id)]
+
     # Median priority of all bug reports made by the author of BR prior to the reporting of BR
     # The number of bug reports made by the author of BR prior to the reporting of BR
     #

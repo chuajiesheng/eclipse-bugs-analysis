@@ -90,6 +90,24 @@ class TestBug(unittest.TestCase):
         author_list[bug.reporter] = 10
         self.assertEqual(bug.priority_of_author(author_list), 10)
 
+    def test_bugs_by_author(self):
+        bug1 = Bug(None)
+        bug1.bug_id = '1'
+        bug1.reporter = 'someone'
+        bug2 = Bug(None)
+        bug2.bug_id = '2'
+        bug2.reporter = 'someone'
+        bug3 = Bug(None)
+        bug3.bug_id = '3'
+        bug3.reporter = 'someone'
+
+        bug4 = Bug(None)
+        bug4.bug_id = '4'
+        bug4.reporter = 'someone else'
+
+        all_bugs = [Bug(None), bug1, bug2, bug3, bug4]
+        self.assertEqual(bug1.bugs_by_author(all_bugs), [bug2, bug3])
+
 
 if __name__ == '__main__':
     unittest.main()
