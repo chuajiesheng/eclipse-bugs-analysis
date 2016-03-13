@@ -280,6 +280,9 @@ class Bug(object):
         return [item for item in all_bugs if (self.assigned_to == item.assigned_to and (include_source_bug or self.bug_id != item.bug_id))]
 
     def translated_priority(self):
+        if self.priority is None:
+            return 0
+        
         return self.PRIORITIES[self.priority]
 
     def all_priorities_assigned_to_author(self, all_bugs):
