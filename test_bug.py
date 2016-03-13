@@ -144,6 +144,9 @@ class TestBug(unittest.TestCase):
         all_bugs = [Bug(None), bug1, bug2, bug3, bug4]
         self.assertEqual(bug1.median_priority_of_author(all_bugs), 2.0)
 
+        self.assertEqual(bug1.median_priority_of_author([bug1]), 1.0)
+        self.assertEqual(bug1.median_priority_of_author([]), 0.0)
+
     def test_bugs_reported_prior(self):
         now = datetime.datetime.now()
         one_hour_before = now.replace(hour=now.hour - 1)

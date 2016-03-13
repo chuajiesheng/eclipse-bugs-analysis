@@ -321,11 +321,18 @@ class Bug(object):
     def mean_priority_of_author(self, all_bugs):
         bugs_by_author = self.bugs_assigned_to_author(all_bugs, include_source_bug=True)
         all_priorities = [item.translated_priority() for item in bugs_by_author]
-        return reduce(lambda x, y: x + y, all_priorities) / float(len(all_priorities))
+
+        if len(all_priorities) == 0:
+            return 0
+
+        return sum(all_priorities) / float(len(all_priorities))
 
     # Median priority of bugs the author fixed
     @staticmethod
     def median(lst):
+        if len(lst) == 0:
+            return 0.0
+
         return numpy.median(numpy.array(lst))
 
     def median_priority_of_author(self, all_bugs):
@@ -344,6 +351,10 @@ class Bug(object):
     def mean_priority_of_bug_by_author_prior(self, all_bugs):
         bugs_prior = self.bugs_reported_prior(all_bugs)
         all_priorities = [item.translated_priority() for item in bugs_prior]
+
+        if len(all_priorities) == 0:
+            return 0
+
         return reduce(lambda x, y: x + y, all_priorities) / float(len(all_priorities))
 
     # Median priority of all bug reports made by the author of BR prior to the reporting of BR
@@ -366,21 +377,21 @@ class Bug(object):
         return self.OS_SYS[self.op_sys]
 
     # Mean priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
-    mean_priority_of_top20 = None
+    mean_priority_of_top20 = 0
     # Median priority of the top-20 most similar bug reports to BR as measured using REP - prior to the reporting of BR
-    median_priority_of_top20 = None
+    median_priority_of_top20 = 0
     # The same as (i, ii) except only the top 10 bug reports are considered
-    mean_priority_of_top10 = None
-    median_priority_of_top10 = None
+    mean_priority_of_top10 = 0
+    median_priority_of_top10 = 0
     # The same as (i, ii) except only the top 5 bug reports are considered
-    mean_priority_of_top5 = None
-    median_priority_of_top5 = None
+    mean_priority_of_top5 = 0
+    median_priority_of_top5 = 0
     # The same as (i, ii) except only the top 3 bug reports are considered
-    mean_priority_of_top3 = None
-    median_priority_of_top3 = None
+    mean_priority_of_top3 = 0
+    median_priority_of_top3 = 0
     # The same as (i, ii) except only the top 1 bug report is considered
-    mean_priority_of_top1 = None
-    median_priority_of_top1 = None
+    mean_priority_of_top1 = 0
+    median_priority_of_top1 = 0
 
     #
     # # Severity Factor
@@ -486,14 +497,17 @@ class Bug(object):
             same_product = self.product == item.product
             created_prior = item.creation_ts < self.creation_ts
             if same_product and created_prior:
-                total_priority += item.translated_priority
+                total_priority += item.translated_priority()
                 num_of_bugs += 1
+
+        if num_of_bugs == 0:
+            return 0
 
         return total_priority / float(num_of_bugs)
 
     # Median priority of bug reports made for the same product as that of BR prior to the reporting of BR
     def median_priority_of_bug_for_same_product_prior(self, all_bugs):
-        bugs = [item.translated_priority for item in all_bugs if (self.product == item.product and item.creation_ts < self.creation_ts)]
+        bugs = [item.translated_priority() for item in all_bugs if (self.product == item.product and item.creation_ts < self.creation_ts)]
         return self.median(bugs)
 
     # The same as (i, ii, iii, iv, v, vi, vii, viii) except they are for the component field of BR.
@@ -693,12 +707,15 @@ class Bug(object):
             same_component = self.component == item.component
             created_prior = item.creation_ts < self.creation_ts
             if same_component and created_prior:
-                total_priority += item.translated_priority
+                total_priority += item.translated_priority()
                 num_of_bugs += 1
+
+        if num_of_bugs == 0:
+            return 0
 
         return total_priority / float(num_of_bugs)
 
     # Median priority of bug reports made for the same component as that of BR prior to the reporting of BR
     def median_priority_of_bug_for_same_component_prior(self, all_bugs):
-        bugs = [item.translated_priority for item in all_bugs if (self.component == item.component and item.creation_ts < self.creation_ts)]
+        bugs = [item.translated_priority() for item in all_bugs if (self.component == item.component and item.creation_ts < self.creation_ts)]
         return self.median(bugs)
