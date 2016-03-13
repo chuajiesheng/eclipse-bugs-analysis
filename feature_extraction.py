@@ -4,6 +4,7 @@ from xml.dom import minidom
 from xml import parsers
 import threading
 import bug
+import sys
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
 bugs = []
@@ -24,7 +25,8 @@ def parse_file(file_path):
     try:
         xmldoc = minidom.parse(file_path)
     except parsers.expat.ExpatError as e:
-        print file_path, '-', e
+        str = '{} - {}'.format(file_path, e)
+        print >> sys.stderr, str
         return
 
     itemlist = xmldoc.getElementsByTagName('bug')
