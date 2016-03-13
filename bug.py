@@ -308,7 +308,16 @@ class Bug(object):
         bugs_by_author = self.bugs_reported_by_author(all_bugs)
         return [item for item in bugs_by_author if item.creation_ts < self.creation_ts]
 
+    def mean_priority_of_bug_by_author_prior(self, all_bugs):
+        bugs_prior = self.bugs_reported_prior(all_bugs)
+        all_priorities = [item.translated_priority() for item in bugs_prior]
+        return reduce(lambda x, y: x + y, all_priorities) / float(len(all_priorities))
+
     # Median priority of all bug reports made by the author of BR prior to the reporting of BR
+    def median_priority_of_bug_by_author_prior(self, all_bugs):
+        bugs_prior = self.bugs_reported_prior(all_bugs)
+        all_priorities = [item.translated_priority() for item in bugs_prior]
+        return self.median(all_priorities)
 
     # The number of bug reports made by the author of BR prior to the reporting of BR
     #
