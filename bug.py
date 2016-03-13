@@ -10,6 +10,15 @@ class Bug(object):
               'bug_status', 'resolution', 'priority', 'bug_severity', 'target_milestone', 'blocked', 'dependson',
               'everconfirmed', 'reporter', 'assigned_to', 'cc', 'qa_contact', 'long_des']
     CSV_STRING = "{},{},\"{}\",{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}"
+    SEVERITY_LIST = [
+            'enhancement',
+            'trivial',
+            'minor',
+            'normal',
+            'major',
+            'critical',
+            'blocker',
+        ]
 
     bug_id = None
     creation_ts = None
@@ -223,6 +232,26 @@ class Bug(object):
         return num_of_related_bugs
 
     # Number of bugs reported with the same or higher severity within 7 days before the reporting of BR
+    def same_or_higher_severity(self):
+        if self.bug_severity not in Bug.SEVERITY_LIST:
+            return Bug.SEVERITY_LIST
+
+        return Bug.SEVERITY_LIST[Bug.SEVERITY_LIST.index(self.bug_severity):]
+
+    def num_of_bugs_with_same_or_higher_severity(self, bug_severity_list, days):
+        if not isinstance(bug_severity_list, list):
+            return 0
+
+        num_of_related_bugs = 0
+        for bug_severity, bug_creation_date in bug_severity_list:
+            same_or_higher_severity = bug_severity in self.same_or_higher_severity()
+            within_time_period = self.within_day(bug_creation_date, self.creation_ts, days)
+
+            if same_or_higher_severity and within_time_period:
+                num_of_related_bugs += 1
+
+        return num_of_related_bugs
+
     # The same as (i, ii, iii) except the time duration is 30 days
     # The same as (i, ii, iii) except the time duration is 1 day
     # The same as (i, ii, iii) except the time duration is 3 days

@@ -55,6 +55,32 @@ class TestBug(unittest.TestCase):
 
         self.assertEqual(bug.num_of_bugs_with_severity(bug_severity_list, 5), 2)
 
+    def test_same_or_higher_severity(self):
+        bug = Bug(None)
+
+        bug.bug_severity = None
+        self.assertEqual(bug.same_or_higher_severity(), Bug.SEVERITY_LIST)
+
+        bug.bug_severity = 'something random'
+        self.assertEqual(bug.same_or_higher_severity(), Bug.SEVERITY_LIST)
+
+        bug.bug_severity = 'normal'
+        self.assertEqual(bug.same_or_higher_severity(), ['normal', 'major', 'critical', 'blocker'])
+
+    def test_num_of_bugs_with_same_or_higher_severity(self):
+        date1 = datetime.datetime(2000, 10, 10, 10, 10, 10, 10)
+        date2 = datetime.datetime(2000, 10, 14, 10, 10, 10, 10)
+        date3 = datetime.datetime(2000, 10, 15, 9, 10, 10, 10)
+        date4 = datetime.datetime(2000, 10, 15, 10, 10, 10, 10)
+
+        bug_severity_list = [('normal', date1), ('major', date2), ('blocker', date3), ('normal', date4), ('major', date4)]
+
+        bug = Bug(None)
+        bug.bug_severity = 'major'
+        bug.creation_ts = datetime.datetime(2000, 10, 10, 10, 10, 10, 10)
+
+        self.assertEqual(bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, 5), 2)
+
 
 if __name__ == '__main__':
     unittest.main()
