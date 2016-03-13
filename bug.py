@@ -202,6 +202,20 @@ class Bug(object):
         return len(related_bugs)
 
     # Number of bugs reported with the same severity within 7 days before the reporting of BR
+    def num_of_bugs_with_severity(self, bug_severity_list, days):
+        if not isinstance(bug_severity_list, list):
+            return 0
+
+        num_of_related_bugs = 0
+        for bug_severity, bug_creation_date in bug_severity_list:
+            same_severity = bug_severity == self.bug_severity
+            within_time_period = self.within_day(bug_creation_date, self.creation_ts, days)
+
+            if same_severity and within_time_period:
+                num_of_related_bugs += 1
+
+        return num_of_related_bugs
+
     # Number of bugs reported with the same or higher severity within 7 days before the reporting of BR
     # The same as (i, ii, iii) except the time duration is 30 days
     # The same as (i, ii, iii) except the time duration is 1 day
