@@ -184,13 +184,21 @@ class Bug(object):
     @staticmethod
     def within_day(start, end, num_of_days):
         ONE_DAY = 60 * 60 * 24
-        return (end - start).total_seconds() < (num_of_days * ONE_DAY)
+        diff_in_secs = (end - start).total_seconds()
+        return abs(diff_in_secs) < (num_of_days * ONE_DAY)
 
     def num_of_comments(self, days):
         comments = [item for item in self.long_desc if self.within_day(self.creation_ts, parse(item.bug_when), days)]
         return len(comments)
 
     # Number of bugs reported within 7 days before the reporting of BR
+    def num_of_bugs(self, bug_creation_dates, days):
+        if not isinstance(bug_creation_dates, list):
+            return 0
+
+        related_bugs = [item for item in bug_creation_dates if self.within_day(item, self.creation_ts, days)]
+        return len(related_bugs)
+
     # Number of bugs reported with the same severity within 7 days before the reporting of BR
     # Number of bugs reported with the same or higher severity within 7 days before the reporting of BR
     # The same as (i, ii, iii) except the time duration is 30 days

@@ -28,6 +28,19 @@ class TestBug(unittest.TestCase):
 
         self.assertEqual(bug.num_of_comments(5), 1)
 
+    def test_num_of_bugs(self):
+        date1 = datetime.datetime(2000, 10, 10, 10, 10, 10, 10)
+        date2 = datetime.datetime(2000, 10, 14, 10, 10, 10, 10)
+        date3 = datetime.datetime(2000, 10, 15, 9, 10, 10, 10)
+        date4 = datetime.datetime(2000, 10, 15, 10, 10, 10, 10)
+
+        bug_creation_dates = [date1, date2, date3, date4]
+
+        bug = Bug(None)
+        bug.creation_ts = datetime.datetime(2000, 10, 10, 10, 10, 10, 10)
+
+        self.assertEqual(bug.num_of_bugs(bug_creation_dates, 5), 3)
+
 
 if __name__ == '__main__':
     unittest.main()
