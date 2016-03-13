@@ -4,6 +4,7 @@ from feature_extraction import NodeUtil
 from long_desc import LongDesc
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+import numpy
 
 
 class Bug(object):
@@ -275,23 +276,32 @@ class Bug(object):
 
     # # Author Factor
     # Mean priority of bugs the author fixed
-    def priority_of_author(self, author_list):
-        if self.reporter not in author_list.keys():
-            return 0
-
-        return author_list[self.reporter]
+    def bugs_assigned_to_author(self, all_bugs, include_source_bug=False):
+        return [item for item in all_bugs if (self.assigned_to == item.assigned_to and (include_source_bug or self.bug_id != item.bug_id))]
 
     def translated_priority(self):
         return self.PRIORITIES[self.priority]
 
-    def mean_priority_of_author(self, all_bugs):
-        bugs_by_author = self.bugs_by_author(all_bugs, include_source_bug=True)
+    def all_priorities_assigned_to_author(self, all_bugs):
+        bugs_by_author = self.bugs_assigned_to_author(all_bugs, include_source_bug=True)
         all_priorities = [item.translated_priority() for item in bugs_by_author]
+        return all_priorities
+
+    def mean_priority_of_author(self, all_bugs):
+        all_priorities = self.all_priorities_assigned_to_author(all_bugs)
         return reduce(lambda x, y: x + y, all_priorities) / float(len(all_priorities))
 
     # Median priority of bugs the author fixed
+    @staticmethod
+    def median(lst):
+        return numpy.median(numpy.array(lst))
+
+    def median_priority_of_author(self, all_bugs):
+        all_priorities = self.all_priorities_assigned_to_author(all_bugs)
+        return self.median(all_priorities)
+
     # Mean priority of all bug reports made by the author of BR prior to the reporting of BR
-    def bugs_by_author(self, all_bugs, include_source_bug=False):
+    def bugs_reported_by_author(self, all_bugs, include_source_bug=False):
         return [item for item in all_bugs if (self.reporter == item.reporter and (include_source_bug or self.bug_id != item.bug_id))]
 
     # Median priority of all bug reports made by the author of BR prior to the reporting of BR
