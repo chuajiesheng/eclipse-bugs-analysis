@@ -6,6 +6,9 @@ class LongDesc:
     thetext = None
 
     def __init__(self, item):
+        if item is None:
+            return None
+
         self.who = NodeUtil.getText(item.getElementsByTagName('who')[0].childNodes)
         self.bug_when = NodeUtil.getText(item.getElementsByTagName('bug_when')[0].childNodes)
 

@@ -130,12 +130,12 @@ class Bug(object):
 
         average_gap = total_gap / len(all_bug_when_values)
 
-        str = "{},{},{},{},".format(length, total_gap, average_gap, longest_gap)
+        str = "{},{},{},{},{}".format(length, total_gap, average_gap, longest_gap, self.num_of_comments(5))
         return str
 
     def csv_title(self):
         fields = self.FIELDS
-        fields.extend(['total_gap', 'average_gap', 'longest_gap'])
+        fields.extend(['total_gap', 'average_gap', 'longest_gap', '5_days_long_desc'])
         return fields.join(', ')
 
     @staticmethod
