@@ -270,6 +270,12 @@ class Bug(object):
 
     # # Author Factor
     # Mean priority of bugs the author fixed
+    def priority_of_author(self, author_list):
+        if self.reporter not in author_list.keys():
+            return 0
+
+        return author_list[self.reporter]
+
 
     # Median priority of bugs the author fixed
     # Mean priority of all bug reports made by the author of BR prior to the reporting of BR

@@ -81,6 +81,15 @@ class TestBug(unittest.TestCase):
 
         self.assertEqual(bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, 5), 2)
 
+    def test_priority_of_author(self):
+        bug = Bug(None)
+        bug.reporter = 'someone'
+        self.assertEqual(bug.priority_of_author(dict()), 0)
+
+        author_list = dict()
+        author_list[bug.reporter] = 10
+        self.assertEqual(bug.priority_of_author(author_list), 10)
+
 
 if __name__ == '__main__':
     unittest.main()
