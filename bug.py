@@ -21,6 +21,7 @@ class Bug(object):
             'critical',
             'blocker',
         ]
+    PRIORITIES = {'P1': 1, 'P2': 2, 'P3': 3, 'P4': 4, 'P5': 5, 'P6': 6}
 
     bug_id = None
     creation_ts = None
@@ -280,10 +281,18 @@ class Bug(object):
 
         return author_list[self.reporter]
 
+    def translated_priority(self):
+        return self.PRIORITIES[self.priority]
+
+    def mean_priority_of_author(self, all_bugs):
+        bugs_by_author = self.bugs_by_author(all_bugs, include_source_bug=True)
+        all_priorities = [item.translated_priority() for item in bugs_by_author]
+        return reduce(lambda x, y: x + y, all_priorities) / float(len(all_priorities))
+
     # Median priority of bugs the author fixed
     # Mean priority of all bug reports made by the author of BR prior to the reporting of BR
-    def bugs_by_author(self, all_bugs):
-        return [item for item in all_bugs if (self.reporter == item.reporter and self.bug_id != item.bug_id)]
+    def bugs_by_author(self, all_bugs, include_source_bug=False):
+        return [item for item in all_bugs if (self.reporter == item.reporter and (include_source_bug or self.bug_id != item.bug_id))]
 
     # Median priority of all bug reports made by the author of BR prior to the reporting of BR
     # The number of bug reports made by the author of BR prior to the reporting of BR

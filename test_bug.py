@@ -106,7 +106,30 @@ class TestBug(unittest.TestCase):
         bug4.reporter = 'someone else'
 
         all_bugs = [Bug(None), bug1, bug2, bug3, bug4]
-        self.assertEqual(bug1.bugs_by_author(all_bugs), [bug2, bug3])
+        self.assertEqual(bug1.bugs_by_author(all_bugs, include_source_bug=True), [bug1, bug2, bug3])
+        self.assertEqual(bug1.bugs_by_author(all_bugs, include_source_bug=False), [bug2, bug3])
+
+    def test_mean_priority_of_author(self):
+        bug1 = Bug(None)
+        bug1.bug_id = '1'
+        bug1.priority = 'P1'
+        bug1.reporter = 'someone'
+        bug2 = Bug(None)
+        bug2.bug_id = '2'
+        bug2.priority = 'P2'
+        bug2.reporter = 'someone'
+        bug3 = Bug(None)
+        bug3.bug_id = '3'
+        bug3.priority = 'P3'
+        bug3.reporter = 'someone'
+
+        bug4 = Bug(None)
+        bug4.bug_id = '4'
+        bug4.priority = 'P4'
+        bug4.reporter = 'someone else'
+
+        all_bugs = [Bug(None), bug1, bug2, bug3, bug4]
+        self.assertEqual(bug1.mean_priority_of_author(all_bugs), 2.0)
 
 
 if __name__ == '__main__':
