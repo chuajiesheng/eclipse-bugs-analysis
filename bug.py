@@ -320,6 +320,9 @@ class Bug(object):
         return self.median(all_priorities)
 
     # The number of bug reports made by the author of BR prior to the reporting of BR
+    def num_of_bug_by_author_prior(self, all_bugs):
+        bugs_prior = self.bugs_reported_prior(all_bugs)
+        return len(bugs_prior)
     #
     # # Related-Report Factor
     # Number of comments in the bug report
