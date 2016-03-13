@@ -3,6 +3,7 @@ import string
 from feature_extraction import NodeUtil
 from long_desc import LongDesc
 from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer
 
 
 class Bug(object):
@@ -262,7 +263,10 @@ class Bug(object):
         if self.short_desc is None:
             return []
 
-        return [word for word in self.short_desc.split(' ') if word not in stopwords.words('english')]
+        tokenizer = RegexpTokenizer(r'\w+')
+        words = tokenizer.tokenize(self.short_desc)
+
+        return [word for word in words if word not in stopwords.words('english')]
 
     def to_short_desc_csv(self):
         words = self.short_desc_without_stop_words()
