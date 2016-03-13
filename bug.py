@@ -285,13 +285,9 @@ class Bug(object):
 
         return self.PRIORITIES[self.priority]
 
-    def all_priorities_assigned_to_author(self, all_bugs):
+    def mean_priority_of_author(self, all_bugs):
         bugs_by_author = self.bugs_assigned_to_author(all_bugs, include_source_bug=True)
         all_priorities = [item.translated_priority() for item in bugs_by_author]
-        return all_priorities
-
-    def mean_priority_of_author(self, all_bugs):
-        all_priorities = self.all_priorities_assigned_to_author(all_bugs)
         return reduce(lambda x, y: x + y, all_priorities) / float(len(all_priorities))
 
     # Median priority of bugs the author fixed
@@ -300,7 +296,8 @@ class Bug(object):
         return numpy.median(numpy.array(lst))
 
     def median_priority_of_author(self, all_bugs):
-        all_priorities = self.all_priorities_assigned_to_author(all_bugs)
+        bugs_by_author = self.bugs_assigned_to_author(all_bugs, include_source_bug=True)
+        all_priorities = [item.translated_priority() for item in bugs_by_author]
         return self.median(all_priorities)
 
     # Mean priority of all bug reports made by the author of BR prior to the reporting of BR
