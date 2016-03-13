@@ -144,6 +144,35 @@ class TestBug(unittest.TestCase):
         all_bugs = [Bug(None), bug1, bug2, bug3, bug4]
         self.assertEqual(bug1.median_priority_of_author(all_bugs), 2.0)
 
+    def test_bugs_reported_prior(self):
+        now = datetime.datetime.now()
+        one_hour_before = now.replace(hour=now.hour - 1)
+        one_hour_after = now.replace(hour=now.hour + 1)
+
+        bug1 = Bug(None)
+        bug1.bug_id = '1'
+        bug1.priority = 'P1'
+        bug1.creation_ts = one_hour_before
+        bug1.reporter = 'someone'
+        bug2 = Bug(None)
+        bug2.bug_id = '2'
+        bug2.creation_ts = one_hour_before
+        bug2.priority = 'P2'
+        bug2.reporter = 'someone'
+        bug3 = Bug(None)
+        bug3.bug_id = '3'
+        bug3.priority = 'P3'
+        bug3.reporter = 'someone'
+        bug3.creation_ts = one_hour_after
+
+        bug4 = Bug(None)
+        bug4.bug_id = '4'
+        bug4.priority = 'P4'
+        bug4.reporter = 'someone else'
+        bug4.creation_ts = one_hour_before
+
+        all_bugs = [Bug(None), bug1, bug2, bug3, bug4]
+        self.assertEqual(bug3.bugs_reported_prior(all_bugs), [bug1, bug2])
 
 if __name__ == '__main__':
     unittest.main()

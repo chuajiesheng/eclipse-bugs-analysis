@@ -282,7 +282,7 @@ class Bug(object):
     def translated_priority(self):
         if self.priority is None:
             return 0
-        
+
         return self.PRIORITIES[self.priority]
 
     def all_priorities_assigned_to_author(self, all_bugs):
@@ -307,7 +307,12 @@ class Bug(object):
     def bugs_reported_by_author(self, all_bugs, include_source_bug=False):
         return [item for item in all_bugs if (self.reporter == item.reporter and (include_source_bug or self.bug_id != item.bug_id))]
 
+    def bugs_reported_prior(self, all_bugs):
+        bugs_by_author = self.bugs_reported_by_author(all_bugs)
+        return [item for item in bugs_by_author if item.creation_ts < self.creation_ts]
+
     # Median priority of all bug reports made by the author of BR prior to the reporting of BR
+
     # The number of bug reports made by the author of BR prior to the reporting of BR
     #
     # # Related-Report Factor
