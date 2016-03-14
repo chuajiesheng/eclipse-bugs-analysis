@@ -7,6 +7,9 @@ import bug
 import sys
 import numpy as np
 import scipy.sparse as sps
+import code
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
 bugs = []
@@ -47,14 +50,19 @@ def multithread_parse_file(file_path):
 
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
-    files = ['bugs000101-000200.xml']
+    # files = ['bugs000101-000200.xml']
     for f in files:
         file_path = join(DATA_DIRECTORY, f)
         parse_file(file_path)
 
+    documents = [item.to_short_desc() for item in bugs]
+    tfidf_vectorizer = TfidfVectorizer()
+    tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+
     # row = all bugs length
     # column = features
-    features = sps.lil_matrix((len(bugs), 43), dtype=np.longdouble)
+    columns = 52 + len(bug.Bug.OS_SYS) + len(bug.Bug.SEVERITY_LIST) + len(bug.Bug.PRODUCTS) + len(bug.Bug.COMPONENTS)
+    features = sps.lil_matrix((len(bugs), columns), dtype=np.longdouble)
 
     bug_severity_list = [(b.bug_severity, b.creation_ts) for b in bugs]
 
@@ -118,7 +126,31 @@ if __name__ == '__main__':
         features[i, col_index + b.os()] = 1
         col_index += len(bug.Bug.OS_SYS) + 1
 
-        # TODO: cosine similarity
+        cosine_similarities = cosine_similarity(tfidf_matrix[i:i+1], tfidf_matrix).flatten()
+        related_docs_indices = cosine_similarities.argsort()[:-21:-1]
+        priorities = [bugs[item].translated_priority() for item in related_docs_indices]
+        b.mean_priority_of_top20 = np.mean(np.array(priorities))
+        b.median_priority_of_top20 = np.median(np.array(priorities))
+
+        related_docs_indices = cosine_similarities.argsort()[:-11:-1]
+        priorities = [bugs[item].translated_priority() for item in related_docs_indices]
+        b.mean_priority_of_top10 = np.mean(np.array(priorities))
+        b.median_priority_of_top10 = np.median(np.array(priorities))
+
+        related_docs_indices = cosine_similarities.argsort()[:-6:-1]
+        priorities = [bugs[item].translated_priority() for item in related_docs_indices]
+        b.mean_priority_of_top5 = np.mean(np.array(priorities))
+        b.median_priority_of_top5 = np.median(np.array(priorities))
+
+        related_docs_indices = cosine_similarities.argsort()[:-4:-1]
+        priorities = [bugs[item].translated_priority() for item in related_docs_indices]
+        b.mean_priority_of_top3 = np.mean(np.array(priorities))
+        b.median_priority_of_top3 = np.median(np.array(priorities))
+
+        related_docs_indices = cosine_similarities.argsort()[:-2:-1]
+        priorities = [bugs[item].translated_priority() for item in related_docs_indices]
+        b.mean_priority_of_top1 = np.mean(np.array(priorities))
+        b.median_priority_of_top1 = np.median(np.array(priorities))
 
         features[i, col_index] = b.mean_priority_of_top20
         col_index += 1
@@ -150,7 +182,7 @@ if __name__ == '__main__':
         features[i, col_index] = b.median_priority_of_top1
         col_index += 1
 
-        # TODO: end cosine similarity
+        # code.interact(local=locals())
 
         features[i, col_index + b.severity_index()] = 1
         col_index += len(bug.Bug.SEVERITY_LIST) + 1

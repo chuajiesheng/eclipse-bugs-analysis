@@ -307,6 +307,10 @@ class Bug(object):
         words = self.short_desc_without_stop_words()
         return '{},{}'.format(self.priority, ','.join(words))
 
+    def to_short_desc(self):
+        words = self.short_desc_without_stop_words()
+        return '{},{}'.format(self.priority, ' '.join(words))
+
     # # Author Factor
     # Mean priority of bugs the author fixed
     def bugs_assigned_to_author(self, all_bugs, include_source_bug=False):
