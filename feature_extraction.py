@@ -66,13 +66,36 @@ if __name__ == '__main__':
         features[i, col_index] = b.num_of_comments(5)
         col_index += 1
 
-        features[i, col_index] = b.num_of_bugs(bug_severity_list, 7)
+        days_before = 7
+        features[i, col_index] = b.num_of_bugs(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_severity(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
         col_index += 1
 
-        features[i, col_index] = b.num_of_bugs_with_severity(bug_severity_list, 7)
+        days_before = 30
+        features[i, col_index] = b.num_of_bugs(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_severity(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
         col_index += 1
 
-        features[i, col_index] = b.num_of_bugs_with_same_or_higher_severity(bug_severity_list, 5)
+        days_before = 1
+        features[i, col_index] = b.num_of_bugs(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_severity(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
+        col_index += 1
+
+        days_before = 3
+        features[i, col_index] = b.num_of_bugs(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_severity(bug_severity_list, days_before)
+        col_index += 1
+        features[i, col_index] = b.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
         col_index += 1
 
         # TODO: Textual Factor
