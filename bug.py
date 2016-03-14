@@ -398,9 +398,9 @@ class Bug(object):
     # SEV BR's severity field.
     def severity_index(self):
         if self.bug_severity not in self.SEVERITY_LIST:
-            return -1
+            return 0
 
-        return self.SEVERITY_LIST.index(self.bug_severity)
+        return self.SEVERITY_LIST.index(self.bug_severity) + 1
     #
     # # Product Factor
     # BR's product field. This categorical feature is translated into multiple binary features.

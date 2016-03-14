@@ -91,8 +91,8 @@ if __name__ == '__main__':
         features[i, col_index] = b.num_of_bug_by_author_prior(bugs)
         col_index += 1
 
-        features[i, col_index] = b.os()
-        col_index += 1
+        features[i, col_index + b.os()] = 1
+        col_index += len(bug.Bug.OS_SYS) + 1
 
         # TODO: cosine similarity
 
@@ -128,11 +128,11 @@ if __name__ == '__main__':
 
         # TODO: end cosine similarity
 
-        features[i, col_index] = b.severity_index()
-        col_index += 1
+        features[i, col_index + b.severity_index()] = 1
+        col_index += len(bug.Bug.SEVERITY_LIST) + 1
 
-        features[i, col_index] = b.product_feature()
-        col_index += 1
+        features[i, col_index + b.product_feature()] = 1
+        col_index += len(bug.Bug.PRODUCTS) + 1
 
         features[i, col_index] = b.num_of_bug_for_same_product_prior(bugs)
         col_index += 1
@@ -164,8 +164,8 @@ if __name__ == '__main__':
         features[i, col_index] = b.median_priority_of_bug_for_same_product_prior(bugs)
         col_index += 1
 
-        features[i, col_index] = b.component_feature()
-        col_index += 1
+        features[i, col_index + b.component_feature()] = 1
+        col_index += len(bug.Bug.COMPONENTS) + 1
 
         features[i, col_index] = b.num_of_bug_for_same_component_prior(bugs)
         col_index += 1
