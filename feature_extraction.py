@@ -182,8 +182,6 @@ if __name__ == '__main__':
         features[i, col_index] = b.median_priority_of_top1
         col_index += 1
 
-        # code.interact(local=locals())
-
         features[i, col_index + b.severity_index()] = 1
         col_index += len(bug.Bug.SEVERITY_LIST) + 1
 
@@ -252,3 +250,9 @@ if __name__ == '__main__':
 
         features[i, col_index] = b.median_priority_of_bug_for_same_component_prior(bugs)
         col_index += 1
+
+    # code.interact(local=locals())
+    for i in range(features.shape[0]):
+        for j in range(features.shape[1]):
+            print '{}:{} '.format(j, features[i, j]),
+        print ' '
