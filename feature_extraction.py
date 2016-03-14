@@ -59,6 +59,7 @@ if __name__ == '__main__':
     bug_severity_list = [(b.bug_severity, b.creation_ts) for b in bugs]
 
     for i in range(len(bugs)):
+        print 'processing', i, 'of', len(bugs)
         col_index = 0
         b = bugs[i]
 
