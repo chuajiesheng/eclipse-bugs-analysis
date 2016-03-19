@@ -48,187 +48,187 @@ def multithread_parse_file(file_path):
     t.start()
 
 
-def compute_feature(all_bugs, features, row, bug, bug_severity_list, tfidf_matrix):
+def compute_feature(all_bugs, features, row, current_bug, bug_severity_list, tfidf_matrix):
     col_index = 0
 
-    features[row, col_index] = bug.num_of_comments(5)
+    features[row, col_index] = current_bug.num_of_comments(5)
     col_index += 1
 
     days_before = 7
-    features[row, col_index] = bug.num_of_bugs(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_severity(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
     col_index += 1
 
     days_before = 30
-    features[row, col_index] = bug.num_of_bugs(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_severity(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
     col_index += 1
 
     days_before = 1
-    features[row, col_index] = bug.num_of_bugs(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_severity(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
     col_index += 1
 
     days_before = 3
-    features[row, col_index] = bug.num_of_bugs(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_severity(bug_severity_list, days_before)
     col_index += 1
-    features[row, col_index] = bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
+    features[row, col_index] = current_bug.num_of_bugs_with_same_or_higher_severity(bug_severity_list, days_before)
     col_index += 1
 
     # TODO: Textual Factor
 
-    features[row, col_index] = bug.mean_priority_of_author(all_bugs)
+    features[row, col_index] = current_bug.mean_priority_of_author(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_author(all_bugs)
+    features[row, col_index] = current_bug.median_priority_of_author(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.mean_priority_of_bug_by_author_prior(all_bugs)
+    features[row, col_index] = current_bug.mean_priority_of_bug_by_author_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_bug_by_author_prior(all_bugs)
+    features[row, col_index] = current_bug.median_priority_of_bug_by_author_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.num_of_bug_by_author_prior(all_bugs)
+    features[row, col_index] = current_bug.num_of_bug_by_author_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index + bug.os()] = 1
+    features[row, col_index + current_bug.os()] = 1
     col_index += len(bug.Bug.OS_SYS) + 1
 
     cosine_similarities = cosine_similarity(tfidf_matrix[row:row + 1], tfidf_matrix).flatten()
     related_docs_indices = cosine_similarities.argsort()[:-21:-1]
     priorities = [all_bugs[item].translated_priority() for item in related_docs_indices]
-    bug.mean_priority_of_top20 = np.mean(np.array(priorities))
-    bug.median_priority_of_top20 = np.median(np.array(priorities))
+    current_bug.mean_priority_of_top20 = np.mean(np.array(priorities))
+    current_bug.median_priority_of_top20 = np.median(np.array(priorities))
 
     related_docs_indices = cosine_similarities.argsort()[:-11:-1]
     priorities = [all_bugs[item].translated_priority() for item in related_docs_indices]
-    bug.mean_priority_of_top10 = np.mean(np.array(priorities))
-    bug.median_priority_of_top10 = np.median(np.array(priorities))
+    current_bug.mean_priority_of_top10 = np.mean(np.array(priorities))
+    current_bug.median_priority_of_top10 = np.median(np.array(priorities))
 
     related_docs_indices = cosine_similarities.argsort()[:-6:-1]
     priorities = [all_bugs[item].translated_priority() for item in related_docs_indices]
-    bug.mean_priority_of_top5 = np.mean(np.array(priorities))
-    bug.median_priority_of_top5 = np.median(np.array(priorities))
+    current_bug.mean_priority_of_top5 = np.mean(np.array(priorities))
+    current_bug.median_priority_of_top5 = np.median(np.array(priorities))
 
     related_docs_indices = cosine_similarities.argsort()[:-4:-1]
     priorities = [all_bugs[item].translated_priority() for item in related_docs_indices]
-    bug.mean_priority_of_top3 = np.mean(np.array(priorities))
-    bug.median_priority_of_top3 = np.median(np.array(priorities))
+    current_bug.mean_priority_of_top3 = np.mean(np.array(priorities))
+    current_bug.median_priority_of_top3 = np.median(np.array(priorities))
 
     related_docs_indices = cosine_similarities.argsort()[:-2:-1]
     priorities = [all_bugs[item].translated_priority() for item in related_docs_indices]
-    bug.mean_priority_of_top1 = np.mean(np.array(priorities))
-    bug.median_priority_of_top1 = np.median(np.array(priorities))
+    current_bug.mean_priority_of_top1 = np.mean(np.array(priorities))
+    current_bug.median_priority_of_top1 = np.median(np.array(priorities))
 
-    features[row, col_index] = bug.mean_priority_of_top20
+    features[row, col_index] = current_bug.mean_priority_of_top20
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_top20
+    features[row, col_index] = current_bug.median_priority_of_top20
     col_index += 1
 
-    features[row, col_index] = bug.mean_priority_of_top10
+    features[row, col_index] = current_bug.mean_priority_of_top10
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_top10
+    features[row, col_index] = current_bug.median_priority_of_top10
     col_index += 1
 
-    features[row, col_index] = bug.mean_priority_of_top5
+    features[row, col_index] = current_bug.mean_priority_of_top5
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_top5
+    features[row, col_index] = current_bug.median_priority_of_top5
     col_index += 1
 
-    features[row, col_index] = bug.mean_priority_of_top3
+    features[row, col_index] = current_bug.mean_priority_of_top3
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_top3
+    features[row, col_index] = current_bug.median_priority_of_top3
     col_index += 1
 
-    features[row, col_index] = bug.mean_priority_of_top1
+    features[row, col_index] = current_bug.mean_priority_of_top1
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_top1
+    features[row, col_index] = current_bug.median_priority_of_top1
     col_index += 1
 
-    features[row, col_index + bug.severity_index()] = 1
+    features[row, col_index + current_bug.severity_index()] = 1
     col_index += len(bug.Bug.SEVERITY_LIST) + 1
 
-    features[row, col_index + bug.product_feature()] = 1
+    features[row, col_index + current_bug.product_feature()] = 1
     col_index += len(bug.Bug.PRODUCTS) + 1
 
-    features[row, col_index] = bug.num_of_bug_for_same_product_prior(all_bugs)
+    features[row, col_index] = current_bug.num_of_bug_for_same_product_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.num_of_bug_for_same_product_and_severity_prior(all_bugs)
+    features[row, col_index] = current_bug.num_of_bug_for_same_product_and_severity_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.num_of_bug_for_same_product_and_same_or_higher_severity_prior(all_bugs)
+    features[row, col_index] = current_bug.num_of_bug_for_same_product_and_same_or_higher_severity_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p1_bug_with_same_priority_and_prior(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p1_bug_with_same_priority_and_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p2_bug_with_same_priority_and_prior(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p2_bug_with_same_priority_and_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p3_bug_with_same_priority_and_prior(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p3_bug_with_same_priority_and_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p4_bug_with_same_priority_and_prior(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p4_bug_with_same_priority_and_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p5_bug_with_same_priority_and_prior(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p5_bug_with_same_priority_and_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.mean_priority_of_bug_for_same_product_prior(all_bugs)
+    features[row, col_index] = current_bug.mean_priority_of_bug_for_same_product_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_bug_for_same_product_prior(all_bugs)
+    features[row, col_index] = current_bug.median_priority_of_bug_for_same_product_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index + bug.component_feature()] = 1
+    features[row, col_index + current_bug.component_feature()] = 1
     col_index += len(bug.Bug.COMPONENTS) + 1
 
-    features[row, col_index] = bug.num_of_bug_for_same_component_prior(all_bugs)
+    features[row, col_index] = current_bug.num_of_bug_for_same_component_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.num_of_bug_for_same_component_and_severity_prior(all_bugs)
+    features[row, col_index] = current_bug.num_of_bug_for_same_component_and_severity_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.num_of_bug_for_same_component_and_same_or_higher_severity_prior(all_bugs)
+    features[row, col_index] = current_bug.num_of_bug_for_same_component_and_same_or_higher_severity_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p1_bug_with_same_priority_and_prior_for_component(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p1_bug_with_same_priority_and_prior_for_component(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p2_bug_with_same_priority_and_prior_for_component(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p2_bug_with_same_priority_and_prior_for_component(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p3_bug_with_same_priority_and_prior_for_component(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p3_bug_with_same_priority_and_prior_for_component(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p4_bug_with_same_priority_and_prior_for_component(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p4_bug_with_same_priority_and_prior_for_component(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.pro_of_p5_bug_with_same_priority_and_prior_for_component(all_bugs)
+    features[row, col_index] = current_bug.pro_of_p5_bug_with_same_priority_and_prior_for_component(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.mean_priority_of_bug_for_same_component_prior(all_bugs)
+    features[row, col_index] = current_bug.mean_priority_of_bug_for_same_component_prior(all_bugs)
     col_index += 1
 
-    features[row, col_index] = bug.median_priority_of_bug_for_same_component_prior(all_bugs)
+    features[row, col_index] = current_bug.median_priority_of_bug_for_same_component_prior(all_bugs)
     col_index += 1
 
 
