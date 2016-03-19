@@ -37,7 +37,7 @@ def parse_file(file_path):
     itemlist = xmldoc.getElementsByTagName('bug')
     for item in itemlist:
         b = bug.Bug(item)
-        if b is not None:
+        if b is not None and not b.error:
             bugs.append(b)
             # print b.to_csv()
             # print b.to_short_desc_csv()
@@ -50,7 +50,7 @@ def multithread_parse_file(file_path):
 
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
-    # files = ['bugs000101-000200.xml']
+    # files = ['bugs000001-000100.xml']
     for f in files:
         print 'read', f
         file_path = join(DATA_DIRECTORY, f)
@@ -257,7 +257,10 @@ if __name__ == '__main__':
         col_index += 1
 
     # code.interact(local=locals())
+    output_file = open('features.txt', 'w')
+
     for i in range(features.shape[0]):
+        output_file.write('{} '.format(bugs[i].translated_priority()))
         for j in range(features.shape[1]):
-            print '{}:{} '.format(j, features[i, j]),
-        print ' '
+            output_file.write('{}:{} '.format(j, features[i, j]))
+        output_file.write('\n')
