@@ -58,10 +58,9 @@ class Bug(object):
     }
 
     bug_id = None
-    error = False
-    creation_ts = 0
+    creation_ts = None
     short_desc = None
-    delta_ts = 0
+    delta_ts = None
     reporter_accessible = None
     cclist_accessible = None
     classification_id = None
@@ -88,7 +87,6 @@ class Bug(object):
 
     def __init__(self, item):
         if item is None:
-            self.error = True
             return None
 
         self.bug_id = NodeUtil.getText(item.getElementsByTagName('bug_id')[0].childNodes)
@@ -96,7 +94,6 @@ class Bug(object):
         if len(item.attributes) > 0 and 'error' in item.attributes.keys():
             error = item.attributes['error']
             if error is not None and (error.value == 'NotFound' or error.value == 'NotPermitted'):
-                self.error = True
                 return None
 
         self.creation_ts = parse(NodeUtil.getText(item.getElementsByTagName('creation_ts')[0].childNodes))

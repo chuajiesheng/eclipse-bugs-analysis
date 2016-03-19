@@ -2,7 +2,7 @@ from feature_extraction import NodeUtil
 
 class LongDesc:
     who = None
-    bug_when = 0
+    bug_when = None
     thetext = None
 
     def __init__(self, item):
