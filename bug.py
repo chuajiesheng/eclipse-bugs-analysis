@@ -6,6 +6,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 import numpy
 
+cachedStopWords = stopwords.words("english")
+
 
 class Bug(object):
     FIELDS = ['bug_id', 'creation_ts', 'short_desc', 'delta_ts', 'reporter_accessible', 'cclist_accessible',

@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
+run_id = '20160320-0057'
 bugs = []
 
 class NodeUtil:
@@ -233,6 +234,7 @@ def compute_feature(all_bugs, features, row, current_bug, bug_severity_list, tfi
 
 
 def process_feature(start, end):
+    print 'process_feature', start, 'to', end
     documents = [item.to_short_desc() for item in bugs]
     tfidf_vectorizer = TfidfVectorizer()
     tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
@@ -243,10 +245,10 @@ def process_feature(start, end):
     features = sps.lil_matrix((len(bugs), columns), dtype=np.longdouble)
 
     bug_severity_list = [(b.bug_severity, b.creation_ts) for b in bugs]
-    output_file = open('features.txt', 'w')
+    output_file = open('features_{}_{}to{}.txt'.format(run_id, start, end), 'w')
 
     for i in range(start, end):
-        print 'processing\t{} to\t{}'.format(i, end),
+        print 'processing\t\t{} to\t{}'.format(i, end),
         # print 'processing\t', i, '\tto', len(bugs),
         b = bugs[i]
         compute_feature(bugs, features, i, b, bug_severity_list, tfidf_matrix)
@@ -256,6 +258,8 @@ def process_feature(start, end):
             output_file.write('{}:{} '.format(j, features[i, j]))
         output_file.write('\n')
         print '\tprinted'
+
+    print 'run {}\t{} to\t{}\tcompleted'.format(run_id, start, end)
 
 
 if __name__ == '__main__':
@@ -267,7 +271,14 @@ if __name__ == '__main__':
         parse_file(file_path)
 
     print 'parse completed'
-    process_feature(0, len(bugs))
+
+    start = 0
+    step = 30
+    end = len(bugs) - step
+
+    for start_point in range(start, end, step):
+        t = threading.Thread(target=process_feature, args=(start_point, start_point + step))
+        t.start()
 
 
 
