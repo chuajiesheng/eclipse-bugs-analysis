@@ -245,7 +245,7 @@ def process_feature(start, end):
     features = sps.lil_matrix((len(bugs), columns), dtype=np.longdouble)
 
     bug_severity_list = [(b.bug_severity, b.creation_ts) for b in bugs]
-    output_file = open('features_{}_{}to{}.txt'.format(run_id, start, end), 'w')
+    output_file = open('run/features_{}_{}to{}.txt'.format(run_id, start, end), 'w')
 
     for i in range(start, end):
         print 'processing\t\t{} to\t{}'.format(i, end),
@@ -273,11 +273,15 @@ if __name__ == '__main__':
     print 'parse completed'
 
     start = 0
-    step = 30
-    end = len(bugs) - step
+    step = 20000
+    end = len(bugs)
 
     for start_point in range(start, end, step):
-        t = threading.Thread(target=process_feature, args=(start_point, start_point + step))
+        end_point = start_point + step
+        if end_point > len(bugs):
+            end_point = len(bugs)
+
+        t = threading.Thread(target=process_feature, args=(start_point, end_point))
         t.start()
 
 
