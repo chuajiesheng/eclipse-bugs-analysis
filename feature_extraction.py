@@ -52,8 +52,11 @@ if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
     # files = ['bugs000001-000100.xml']
     for f in files:
+        print 'read', f
         file_path = join(DATA_DIRECTORY, f)
         parse_file(file_path)
+
+    print 'parse completed'
 
     documents = [item.to_short_desc() for item in bugs]
     tfidf_vectorizer = TfidfVectorizer()
