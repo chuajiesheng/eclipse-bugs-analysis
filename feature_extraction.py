@@ -52,17 +52,12 @@ if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
     # files = ['bugs000001-000100.xml']
     for f in files:
-        print 'read', f
         file_path = join(DATA_DIRECTORY, f)
         parse_file(file_path)
-
-    print 'parse completed'
 
     documents = [item.to_short_desc() for item in bugs]
     tfidf_vectorizer = TfidfVectorizer()
     tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
-    doc_cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix).flatten()
-    print 'cosine similarity completed'
 
     # row = all bugs length
     # column = features
@@ -131,7 +126,7 @@ if __name__ == '__main__':
         features[i, col_index + b.os()] = 1
         col_index += len(bug.Bug.OS_SYS) + 1
 
-        cosine_similarities = doc_cosine_similarities[i:i+1].flatten()
+        cosine_similarities = cosine_similarity(tfidf_matrix[i:i+1], tfidf_matrix).flatten()
         related_docs_indices = cosine_similarities.argsort()[:-21:-1]
         priorities = [bugs[item].translated_priority() for item in related_docs_indices]
         b.mean_priority_of_top20 = np.mean(np.array(priorities))
