@@ -276,6 +276,7 @@ if __name__ == '__main__':
     step = 20000
     end = len(bugs)
 
+    p = None
     for start_point in range(start, end, step):
         end_point = start_point + step
         if end_point > len(bugs):
@@ -283,6 +284,8 @@ if __name__ == '__main__':
 
         p = Process(target=process_feature, args=(start_point, end_point))
         p.start()
+
+    if p is not None:
         p.join()
 
 
