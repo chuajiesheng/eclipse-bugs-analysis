@@ -2,7 +2,7 @@ from os import listdir
 from os.path import isfile, join
 from xml.dom import minidom
 from xml import parsers
-import threading
+from multiprocessing import Process
 import bug
 import sys
 import numpy as np
@@ -281,8 +281,9 @@ if __name__ == '__main__':
         if end_point > len(bugs):
             end_point = len(bugs)
 
-        t = threading.Thread(target=process_feature, args=(start_point, end_point))
-        t.start()
+        p = Process(target=process_feature, args=(start_point, end_point))
+        p.start()
+        p.join()
 
 
 
