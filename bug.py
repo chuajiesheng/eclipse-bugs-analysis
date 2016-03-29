@@ -4,6 +4,7 @@ from feature_extraction import NodeUtil
 from long_desc import LongDesc
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+import time
 
 cachedStopWords = stopwords.words("english")
 
@@ -120,8 +121,8 @@ class Bug(object):
 
     def generate_dict(self):
         base = {
-            # 'creation_ts': self.creation_ts,
-            # 'delta_ts': self.delta_ts,
+            'creation_ts': time.mktime(self.creation_ts.timetuple()),
+            'delta_ts': time.mktime(self.delta_ts.timetuple()),
             'reporter_accessible': self.reporter_accessible,
             'cclist_accessible': self.cclist_accessible,
             'classification_id': self.classification_id,
