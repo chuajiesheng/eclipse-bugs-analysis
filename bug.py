@@ -3,6 +3,7 @@ import string
 from feature_extraction import NodeUtil
 from long_desc import LongDesc
 from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer
 
 cachedStopWords = stopwords.words("english")
 
@@ -55,7 +56,9 @@ class Bug(object):
 
         short_desc_element = item.getElementsByTagName('short_desc')
         if short_desc_element is not None and len(short_desc_element) > 0:
-            self.short_desc = self.clean_string(NodeUtil.getText(short_desc_element[0].childNodes))
+            desc = self.clean_string(NodeUtil.getText(short_desc_element[0].childNodes))
+            tokenizer = RegexpTokenizer(r'\w+')
+            self.short_desc = tokenizer.tokenize(desc)
 
         self.delta_ts = parse(NodeUtil.getText(item.getElementsByTagName('delta_ts')[0].childNodes))
         self.reporter_accessible = NodeUtil.getText(item.getElementsByTagName('reporter_accessible')[0].childNodes)
@@ -114,3 +117,48 @@ class Bug(object):
 
         printable = set(string.printable)
         return filter(lambda s: s in printable, str).replace(',', ';')
+
+    def generate_dict(self):
+        base = {
+            # 'creation_ts': self.creation_ts,
+            # 'delta_ts': self.delta_ts,
+            'reporter_accessible': self.reporter_accessible,
+            'cclist_accessible': self.cclist_accessible,
+            'classification_id': self.classification_id,
+            'classification': self.classification,
+            'product': self.product,
+            'component': self.component,
+            'version': self.version,
+            'rep_platform': self.rep_platform,
+            'op_sys': self.op_sys,
+            'bug_status': self.bug_status,
+            'resolution': self.resolution,
+            'priority': self.priority,
+            'bug_severity': self.bug_severity,
+            'target_milestone': self.target_milestone,
+            'everconfirmed': self.everconfirmed,
+            'reporter': self.reporter,
+            'assigned_to': self.assigned_to,
+            'qa_contact': self.qa_contact
+        }
+
+        short_desc = self.generate_array_dict('short_desc', self.short_desc)
+        blocked = self.generate_array_dict('blocked', self.blocked)
+        dependson = self.generate_array_dict('dependson', self.dependson)
+        cc = self.generate_array_dict('cc', self.cc)
+
+        return self.merge_dicts(base, short_desc, blocked, dependson, cc)
+
+    @staticmethod
+    def generate_array_dict(key, l):
+        d = dict()
+        for e in l:
+            d['{}={}'.format(key, e)] = True
+        return d
+
+    @staticmethod
+    def merge_dicts(*dict_args):
+        result = {}
+        for dictionary in dict_args:
+            result.update(dictionary)
+        return result
