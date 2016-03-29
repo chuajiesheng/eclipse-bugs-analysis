@@ -7,7 +7,7 @@ import sys
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
 run_id = '20160330-0057'
-bugs = []
+
 
 class NodeUtil:
     @staticmethod
@@ -33,15 +33,22 @@ def parse_file(file_path):
     for item in itemlist:
         b = bug.Bug(item)
         if b is not None and not b.error:
-            bugs.append(b)
+            return b
+
+
+def read_files(files):
+    bugs = []
+    for f in files:
+        print 'read', f
+        file_path = join(DATA_DIRECTORY, f)
+        b = parse_file(file_path)
+        bugs.append(b)
+
+    print 'parse completed'
+    return bugs
 
 
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
-    # files = ['bugs000001-000100.xml']
-    for f in files:
-        print 'read', f
-        file_path = join(DATA_DIRECTORY, f)
-        parse_file(file_path)
-
-    print 'parse completed'
+    files = ['bugs000001-000100.xml']
+    bugs = read_files(files)
