@@ -152,6 +152,9 @@ class Bug(object):
 
     @staticmethod
     def generate_array_dict(key, l):
+        if l is None:
+            return dict()
+
         d = dict()
         for e in l:
             d['{}={}'.format(key, e)] = True
