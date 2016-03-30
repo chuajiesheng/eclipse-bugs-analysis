@@ -51,7 +51,8 @@ def read_files(files):
         print 'read', f
         file_path = join(DATA_DIRECTORY, f)
         b = parse_file(file_path)
-        bugs.extend(b)
+        if b is not None:
+            bugs.extend(b)
 
     print 'parse completed'
     return bugs
