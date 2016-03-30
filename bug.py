@@ -134,7 +134,7 @@ class Bug(object):
             'op_sys': self.op_sys,
             'bug_status': self.bug_status,
             'resolution': self.resolution,
-            'priority': self.priority,
+            'priority': int(self.priority[1:]),
             'bug_severity': self.bug_severity,
             'target_milestone': self.target_milestone,
             'everconfirmed': self.everconfirmed,
