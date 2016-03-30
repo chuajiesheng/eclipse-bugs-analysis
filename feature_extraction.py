@@ -67,11 +67,18 @@ def generate_dicts(bugs):
 
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
-    files = ['bugs000001-000100.xml']
+    # files = ['bugs000001-000100.xml']
     bugs = read_files(files)
     measurements = generate_dicts(bugs)
 
     vec = DictVectorizer()
     matrix = vec.fit_transform(measurements)
+    matrix[np.isnan(matrix.todense())] = 0
+
+    priority_index = vec.vocabulary_.get('priority')
+    target = np.squeeze(np.asarray(matrix[:, priority_index + 1].todense()))
+    training = scipy.sparse.hstack([matrix[:, :priority_index], matrix[:, priority_index + 1:]])
 
     # code.interact(local=locals())
+
+    sklearn.datasets.dump_svmlight_file(training, target, 'training.dat', zero_based=False, multilabel=False)
