@@ -5,9 +5,13 @@ from xml import parsers
 import bug
 import sys
 from sklearn.feature_extraction import DictVectorizer
+import scipy
+import sklearn
+import numpy as np
 import code
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
+ONE_DAY = 86400
 run_id = '20160330-0057'
 
 
