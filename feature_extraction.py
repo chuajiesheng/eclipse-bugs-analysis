@@ -25,60 +25,68 @@ class NodeUtil:
         return ''.join(rc)
 
 
-def parse_file(file_path):
-    bugs = []
-    xmldoc = None
+class Features:
+    vec = None
+    matrix = None
 
-    try:
-        xmldoc = minidom.parse(file_path)
-    except parsers.expat.ExpatError as e:
-        str = '{} - {}'.format(file_path, e)
-        print >> sys.stderr, str
-        return
+    def __init__(self):
+        files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
+        # files = ['bugs000001-000100.xml']
+        bugs = self.read_files(files)
+        measurements = self.generate_dicts(bugs)
 
-    itemlist = xmldoc.getElementsByTagName('bug')
-    for item in itemlist:
-        b = bug.Bug(item)
-        if b is not None and not b.error:
-            bugs.append(b)
+        self.vec = DictVectorizer()
+        self.matrix = self.vec.fit_transform(measurements)
+        self.matrix[np.isnan(self.matrix.todense())] = 0
 
-    return bugs
+    @staticmethod
+    def parse_file(file_path):
+        bugs = []
+        xmldoc = None
 
+        try:
+            xmldoc = minidom.parse(file_path)
+        except parsers.expat.ExpatError as e:
+            str = '{} - {}'.format(file_path, e)
+            print >> sys.stderr, str
+            return
 
-def read_files(files):
-    bugs = []
-    for f in files:
-        print 'read', f
-        file_path = join(DATA_DIRECTORY, f)
-        b = parse_file(file_path)
-        if b is not None:
-            bugs.extend(b)
+        itemlist = xmldoc.getElementsByTagName('bug')
+        for item in itemlist:
+            b = bug.Bug(item)
+            if b is not None and not b.error:
+                bugs.append(b)
 
-    print 'parse completed'
-    return bugs
+        return bugs
 
+    @staticmethod
+    def read_files(files):
+        bugs = []
+        for f in files:
+            print 'read', f
+            file_path = join(DATA_DIRECTORY, f)
+            b = Features.parse_file(file_path)
+            if b is not None:
+                bugs.extend(b)
 
-def generate_dicts(bugs):
-    dicts = []
-    for b in bugs:
-        dicts.append(b.generate_dict())
-    return dicts
+        print 'parse completed'
+        return bugs
+
+    @staticmethod
+    def generate_dicts(bugs):
+        dicts = []
+        for b in bugs:
+            dicts.append(b.generate_dict())
+        return dicts
 
 
 if __name__ == '__main__':
-    files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
-    # files = ['bugs000001-000100.xml']
-    bugs = read_files(files)
-    measurements = generate_dicts(bugs)
+    f = Features()
 
-    vec = DictVectorizer()
-    matrix = vec.fit_transform(measurements)
-    matrix[np.isnan(matrix.todense())] = 0
+    code.interact(local=locals())
 
-    # code.interact(local=locals())
-
-    priority_index = vec.vocabulary_.get('priority')
-    target = np.squeeze(np.asarray(matrix[:, priority_index].todense()))
-    training = scipy.sparse.hstack([matrix[:, :priority_index], matrix[:, priority_index + 1:]])
+    priority_index = f.vec.vocabulary_.get('priority')
+    target = np.squeeze(np.asarray(f.matrix[:, priority_index].todense()))
+    training = scipy.sparse.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:]])
 
     sklearn.datasets.dump_svmlight_file(training, target, 'run/training.dat', zero_based=False, multilabel=False)
