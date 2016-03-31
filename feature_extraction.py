@@ -75,10 +75,10 @@ if __name__ == '__main__':
     matrix = vec.fit_transform(measurements)
     matrix[np.isnan(matrix.todense())] = 0
 
-    priority_index = vec.vocabulary_.get('priority')
-    target = np.squeeze(np.asarray(matrix[:, priority_index + 1].todense()))
-    training = scipy.sparse.hstack([matrix[:, :priority_index], matrix[:, priority_index + 1:]])
-
     # code.interact(local=locals())
 
-    sklearn.datasets.dump_svmlight_file(training, target, 'training.dat', zero_based=False, multilabel=False)
+    priority_index = vec.vocabulary_.get('priority')
+    target = np.squeeze(np.asarray(matrix[:, priority_index].todense()))
+    training = scipy.sparse.hstack([matrix[:, :priority_index], matrix[:, priority_index + 1:]])
+
+    sklearn.datasets.dump_svmlight_file(training, target, 'run/training.dat', zero_based=False, multilabel=False)
