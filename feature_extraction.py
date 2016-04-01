@@ -31,13 +31,15 @@ class Features:
 
     def __init__(self):
         files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
-        # files = ['bugs000001-000100.xml']
+        files = ['bugs000001-000100.xml']
         bugs = self.read_files(files)
         measurements = self.generate_dicts(bugs)
 
         self.vec = DictVectorizer()
         self.matrix = self.vec.fit_transform(measurements)
         self.matrix[np.isnan(self.matrix.todense())] = 0
+
+        self.matrix = self.matrix.toarray()
 
     @staticmethod
     def parse_file(file_path):
@@ -79,9 +81,18 @@ class Features:
             dicts.append(b.generate_dict())
         return dicts
 
+    def row_op(self, op_col, op, op_val, func, func_col):
+        col_index = self.vec.vocabulary_.get(op_col)
+        filtered = self.matrix[op(self.matrix[:, col_index], op_val), :]
+
+        app_col_index = self.vec.vocabulary_.get(func_col)
+        values = filtered[:, app_col_index]
+
+        return func(values)
 
 if __name__ == '__main__':
     f = Features()
+    f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
 
     code.interact(local=locals())
 
