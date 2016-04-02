@@ -113,10 +113,10 @@ if __name__ == '__main__':
     # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
     f2 = f.bugs_within(7)
 
-    code.interact(local=locals())
+    # code.interact(local=locals())
 
     priority_index = f.vec.get_feature_names().index('priority')
-    target = np.squeeze(np.asarray(f.matrix[:, priority_index]))
-    training = scipy.sparse.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:]])
+    target = np.squeeze(f.matrix[:, priority_index])
+    training = np.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:]])
 
     sklearn.datasets.dump_svmlight_file(training, target, 'run/training.dat', zero_based=False, multilabel=False)
