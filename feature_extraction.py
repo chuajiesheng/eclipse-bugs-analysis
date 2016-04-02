@@ -102,7 +102,7 @@ class Features:
         return matching_rows.shape[0]
 
     def bugs_within(self, days):
-        ts_col_index = self.vec.vocabulary_.get('creation_ts')
+        ts_col_index = self.vec.get_feature_names().index('creation_ts')
         row_matcher_func = (lambda x: self.bugs_between(x, ts_col_index, days))
         res = np.apply_along_axis(row_matcher_func, axis=1, arr=self.matrix)
         return res
@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
     code.interact(local=locals())
 
-    priority_index = f.vec.vocabulary_.get('priority')
+    priority_index = f.vec.get_feature_names().index('priority')
     target = np.squeeze(np.asarray(f.matrix[:, priority_index]))
     training = scipy.sparse.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:]])
 
