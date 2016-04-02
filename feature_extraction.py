@@ -98,12 +98,29 @@ class Features:
 
     def bugs_between(self, x, col, days):
         ts = x[col]
-        matching_rows = self.matrix[(((ts - days * ONE_DAY) < self.matrix[:, col]) & (self.matrix[:, col] < ts))]
+        matching_rows = self.matrix[
+            (((ts - days * ONE_DAY) < self.matrix[:, col]) &
+             (self.matrix[:, col] < ts))
+        ]
         return matching_rows.shape[0]
 
-    def bugs_within(self, days):
+    def bugs_between_with_same_severity(self, x, col, days):
+        ts = x[col]
+
+        features = [f for f in self.vec.get_feature_names() if 'bug_severity' in f]
+        feature = [f for f in features if x[self.vec.get_feature_names().index(f)] == 1][0]
+        severity = x[self.vec.get_feature_names().index(feature)]
+
+        matching_rows = self.matrix[
+            (((ts - days * ONE_DAY) < self.matrix[:, col]) &
+             (self.matrix[:, col] < ts)) &
+            (self.matrix[:, severity] == severity)
+        ]
+        return matching_rows.shape[0]
+
+    def bugs_within(self, func, days):
         ts_col_index = self.vec.get_feature_names().index('creation_ts')
-        row_matcher_func = (lambda x: self.bugs_between(x, ts_col_index, days))
+        row_matcher_func = (lambda x: func(x, ts_col_index, days))
         res = np.apply_along_axis(row_matcher_func, axis=1, arr=self.matrix)
         return res
 
@@ -114,15 +131,15 @@ class Features:
 
     def generate_temporal_factor(self):
         tmp1 = self.time_different()
-        tmp4 = self.bugs_within(7)
-        code.interact(local=locals())
-        return np.column_stack((tmp1, tmp4))
+        tmp4 = self.bugs_within(self.bugs_between, 7)
+        tmp5 = self.bugs_within(self.bugs_between_with_same_severity, 7)
+        return np.column_stack((tmp1, tmp4, tmp5))
 
 if __name__ == '__main__':
     f = Features()
     f.read_into_memory()
     # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
-    f2 = f.bugs_within(7)
+    f1 = f.generate_temporal_factor()
 
     code.interact(local=locals())
 

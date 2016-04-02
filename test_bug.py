@@ -19,7 +19,7 @@ class TestBug(unittest.TestCase):
         f.vec = DictVectorizer()
         f.matrix = f.vec.fit_transform(objs).toarray()
 
-        res = f.bugs_within(1)
+        res = f.bugs_within(f.bugs_between, 1)
         expected = np.array([0, 1, 1, 0])
         self.assertTrue((res == expected).all())
 
