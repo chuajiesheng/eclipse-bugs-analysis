@@ -114,7 +114,9 @@ class Features:
 
     def generate_temporal_factor(self):
         tmp1 = self.time_different()
-        return np.hstack(tmp1)
+        tmp4 = self.bugs_within(7)
+        code.interact(local=locals())
+        return np.column_stack((tmp1, tmp4))
 
 if __name__ == '__main__':
     f = Features()
