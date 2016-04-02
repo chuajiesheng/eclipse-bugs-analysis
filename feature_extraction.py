@@ -107,13 +107,22 @@ class Features:
         res = np.apply_along_axis(row_matcher_func, axis=1, arr=self.matrix)
         return res
 
+    def time_different(self):
+        c = self.vec.get_feature_names().index('creation_ts')
+        d = self.vec.get_feature_names().index('delta_ts')
+        return self.matrix[:, c] - self.matrix[:, d]
+
+    def generate_temporal_factor(self):
+        tmp1 = self.time_different()
+        return np.hstack(tmp1)
+
 if __name__ == '__main__':
     f = Features()
     f.read_into_memory()
     # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
     f2 = f.bugs_within(7)
 
-    # code.interact(local=locals())
+    code.interact(local=locals())
 
     priority_index = f.vec.get_feature_names().index('priority')
     target = np.squeeze(f.matrix[:, priority_index])
