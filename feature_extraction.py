@@ -30,15 +30,17 @@ class Features:
     matrix = None
 
     def __init__(self):
+        self.vec = None
+        self.matrix = None
+
+    def read_into_memory(self):
         files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
         files = ['bugs000001-000100.xml']
         bugs = self.read_files(files)
         measurements = self.generate_dicts(bugs)
-
         self.vec = DictVectorizer()
         self.matrix = self.vec.fit_transform(measurements)
         self.matrix[np.isnan(self.matrix.todense())] = 0
-
         self.matrix = self.matrix.toarray()
 
     @staticmethod
@@ -81,23 +83,40 @@ class Features:
             dicts.append(b.generate_dict())
         return dicts
 
-    def row_op(self, op_col, op, op_val, func, func_col):
+    def filter_rows(self, op, op_col, op_val):
         col_index = self.vec.vocabulary_.get(op_col)
         filtered = self.matrix[op(self.matrix[:, col_index], op_val), :]
+        return filtered
+
+    def row_op(self, op_col, op, op_val, func, func_col):
+        filtered = self.filter_rows(op, op_col, op_val)
 
         app_col_index = self.vec.vocabulary_.get(func_col)
         values = filtered[:, app_col_index]
 
         return func(values)
 
+    def bugs_between(self, x, col, days):
+        ts = x[col]
+        matching_rows = self.matrix[(((ts - days * ONE_DAY) < self.matrix[:, col]) & (self.matrix[:, col] < ts))]
+        return matching_rows.shape[0]
+
+    def bugs_within(self, days):
+        ts_col_index = self.vec.vocabulary_.get('creation_ts')
+        row_matcher_func = (lambda x: self.bugs_between(x, ts_col_index, days))
+        res = np.apply_along_axis(row_matcher_func, axis=1, arr=self.matrix)
+        return res
+
 if __name__ == '__main__':
     f = Features()
-    f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
+    f.read_into_memory()
+    # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
+    f2 = f.bugs_within(7)
 
     code.interact(local=locals())
 
     priority_index = f.vec.vocabulary_.get('priority')
-    target = np.squeeze(np.asarray(f.matrix[:, priority_index].todense()))
+    target = np.squeeze(np.asarray(f.matrix[:, priority_index]))
     training = scipy.sparse.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:]])
 
     sklearn.datasets.dump_svmlight_file(training, target, 'run/training.dat', zero_based=False, multilabel=False)
