@@ -145,6 +145,7 @@ class Bug(object):
             'resolution': self.resolution,
             'priority': int(self.priority[1:]),
             'bug_severity': self.SEVERITY_LIST.index(self.bug_severity),
+            'severity': self.bug_severity,
             'target_milestone': self.target_milestone,
             'everconfirmed': self.everconfirmed,
             'reporter': self.reporter,
