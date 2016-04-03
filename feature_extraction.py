@@ -131,9 +131,9 @@ class Features:
             ]
         return matching_rows.shape[0]
 
-    def apply_over(self, col, func, days):
+    def apply_over(self, col, func, val):
         ts_col_index = self.vec.get_feature_names().index(col)
-        row_matcher_func = (lambda x: func(x, ts_col_index, days))
+        row_matcher_func = (lambda x: func(x, ts_col_index, val))
         res = np.apply_along_axis(row_matcher_func, axis=1, arr=self.matrix)
         return res
 
@@ -170,11 +170,47 @@ class Features:
                                 tmp10, tmp11, tmp12,
                                 tmp13, tmp14, tmp15))
 
+    def generate_author_factor(self):
+        author_factor = scipy.sparse.lil_matrix((self.matrix.shape[0], 2))
+        assert author_factor.shape == (self.matrix.shape[0], 2)
+
+        related_authors = [f for f in self.vec.get_feature_names() if 'reporter' in f]
+        for author in related_authors:
+            assert author is not None
+
+            # find index to apply to
+            reported_col = self.vec.get_feature_names().index(author)
+            applicable_rows = np.where(self.matrix[:, reported_col] == 1)
+
+            author_email = author[author.index('=') + 1:]
+
+            # find assigned_to bugs
+            fix_col_name = 'assigned_to=' + author_email
+
+            if fix_col_name in self.vec.get_feature_names():
+                fix_col_num = self.vec.get_feature_names().index(fix_col_name)
+                bugs_author_fixed = self.matrix[(self.matrix[:, fix_col_num] == 1)]
+                assert bugs_author_fixed.shape[1] == self.matrix.shape[1]
+
+                # get feature
+                priority_col = self.vec.get_feature_names().index('priority')
+                avg_priority = np.average(bugs_author_fixed[:, priority_col]) # aut1
+                median_priority = np.median(bugs_author_fixed[:, priority_col]) # aut2
+            else:
+                avg_priority = 0
+                median_priority = 0
+
+            author_factor[applicable_rows, 0] = avg_priority
+            author_factor[applicable_rows, 1] = median_priority
+
+        return np.column_stack((author_factor))
+
 if __name__ == '__main__':
     f = Features()
     f.read_into_memory()
     # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
     f1 = f.generate_temporal_factor()
+    f2 = f.generate_author_factor()
 
     # code.interact(local=locals())
 
