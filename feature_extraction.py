@@ -131,8 +131,8 @@ class Features:
             ]
         return matching_rows.shape[0]
 
-    def bugs_within(self, func, days):
-        ts_col_index = self.vec.get_feature_names().index('creation_ts')
+    def apply_over(self, col, func, days):
+        ts_col_index = self.vec.get_feature_names().index(col)
         row_matcher_func = (lambda x: func(x, ts_col_index, days))
         res = np.apply_along_axis(row_matcher_func, axis=1, arr=self.matrix)
         return res
@@ -142,27 +142,27 @@ class Features:
 
         reported_within = 7
 
-        tmp4 = self.bugs_within(self.bugs_between, reported_within)
-        tmp5 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
-        tmp6 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+        tmp4 = self.apply_over('creation_ts', self.bugs_between, reported_within)
+        tmp5 = self.apply_over('creation_ts', self.bugs_between_with_same_severity, reported_within)
+        tmp6 = self.apply_over('creation_ts', self.bugs_between_with_same_or_higher_severity, reported_within)
 
         reported_within = 30
 
-        tmp7 = self.bugs_within(self.bugs_between, reported_within)
-        tmp8 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
-        tmp9 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+        tmp7 = self.apply_over('creation_ts', self.bugs_between, reported_within)
+        tmp8 = self.apply_over('creation_ts', self.bugs_between_with_same_severity, reported_within)
+        tmp9 = self.apply_over('creation_ts', self.bugs_between_with_same_or_higher_severity, reported_within)
 
         reported_within = 1
 
-        tmp10 = self.bugs_within(self.bugs_between, reported_within)
-        tmp11 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
-        tmp12 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+        tmp10 = self.apply_over('creation_ts', self.bugs_between, reported_within)
+        tmp11 = self.apply_over('creation_ts', self.bugs_between_with_same_severity, reported_within)
+        tmp12 = self.apply_over('creation_ts', self.bugs_between_with_same_or_higher_severity, reported_within)
 
         reported_within = 3
 
-        tmp13 = self.bugs_within(self.bugs_between, reported_within)
-        tmp14 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
-        tmp15 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+        tmp13 = self.apply_over('creation_ts', self.bugs_between, reported_within)
+        tmp14 = self.apply_over('creation_ts', self.bugs_between_with_same_severity, reported_within)
+        tmp15 = self.apply_over('creation_ts', self.bugs_between_with_same_or_higher_severity, reported_within)
 
         return np.column_stack((tmp1,
                                 tmp4, tmp5, tmp6,
