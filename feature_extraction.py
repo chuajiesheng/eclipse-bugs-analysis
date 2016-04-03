@@ -203,10 +203,26 @@ class Features:
             author_factor[applicable_rows, 1] = median_priority
         return author_factor
 
-    def generate_author_factor(self):
-        author_factor = self.bugs_reported_by_author()
+    def bugs_prior(self, x, col, opt):
+        ts = x[col]
+        matching_rows = self.matrix[(self.matrix[:, col] < ts)]
+        return matching_rows.shape[0]
 
-        return np.column_stack((author_factor))
+    def mean_priority_of_bugs_prior(self, x, col, opt):
+        ts = x[col]
+        priority_col = self.vec.get_feature_names().index('priority')
+        matching_rows = self.matrix[(self.matrix[:, col] < ts)]
+        return np.nan_to_num(np.mean(matching_rows[:, priority_col]))
+
+    def generate_author_factor(self):
+        author_factor = self.bugs_reported_by_author().toarray()
+        aut3 = self.apply_over('creation_ts', self.bugs_prior, None)
+        aut3 = aut3.reshape(aut3.shape[0], 1)
+
+        aut4 = self.apply_over('creation_ts', self.mean_priority_of_bugs_prior, None)
+        aut4 = aut4.reshape(aut4.shape[0], 1)
+        code.interact(local=locals())
+        return np.concatenate((author_factor, aut3, aut4), axis=1)
 
 
 if __name__ == '__main__':
