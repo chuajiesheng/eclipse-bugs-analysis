@@ -96,6 +96,11 @@ class Features:
 
         return func(values)
 
+    def time_different(self):
+        c = self.vec.get_feature_names().index('creation_ts')
+        d = self.vec.get_feature_names().index('delta_ts')
+        return self.matrix[:, c] - self.matrix[:, d]
+
     def bugs_between(self, x, col, days):
         ts = x[col]
         matching_rows = self.matrix[
@@ -123,11 +128,6 @@ class Features:
         row_matcher_func = (lambda x: func(x, ts_col_index, days))
         res = np.apply_along_axis(row_matcher_func, axis=1, arr=self.matrix)
         return res
-
-    def time_different(self):
-        c = self.vec.get_feature_names().index('creation_ts')
-        d = self.vec.get_feature_names().index('delta_ts')
-        return self.matrix[:, c] - self.matrix[:, d]
 
     def generate_temporal_factor(self):
         tmp1 = self.time_different()
