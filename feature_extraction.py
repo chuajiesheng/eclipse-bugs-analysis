@@ -170,10 +170,9 @@ class Features:
                                 tmp10, tmp11, tmp12,
                                 tmp13, tmp14, tmp15))
 
-    def generate_author_factor(self):
+    def bugs_reported_by_author(self):
         author_factor = scipy.sparse.lil_matrix((self.matrix.shape[0], 2))
         assert author_factor.shape == (self.matrix.shape[0], 2)
-
         related_authors = [f for f in self.vec.get_feature_names() if 'reporter' in f]
         for author in related_authors:
             assert author is not None
@@ -194,16 +193,21 @@ class Features:
 
                 # get feature
                 priority_col = self.vec.get_feature_names().index('priority')
-                avg_priority = np.average(bugs_author_fixed[:, priority_col]) # aut1
-                median_priority = np.median(bugs_author_fixed[:, priority_col]) # aut2
+                avg_priority = np.average(bugs_author_fixed[:, priority_col])  # aut1
+                median_priority = np.median(bugs_author_fixed[:, priority_col])  # aut2
             else:
                 avg_priority = 0
                 median_priority = 0
 
             author_factor[applicable_rows, 0] = avg_priority
             author_factor[applicable_rows, 1] = median_priority
+        return author_factor
+
+    def generate_author_factor(self):
+        author_factor = self.bugs_reported_by_author()
 
         return np.column_stack((author_factor))
+
 
 if __name__ == '__main__':
     f = Features()
