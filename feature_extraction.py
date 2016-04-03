@@ -111,16 +111,24 @@ class Features:
 
     def bugs_between_with_same_severity(self, x, col, days):
         ts = x[col]
-
-        features = [f for f in self.vec.get_feature_names() if 'bug_severity' in f]
-        feature = [f for f in features if x[self.vec.get_feature_names().index(f)] == 1][0]
-        severity = x[self.vec.get_feature_names().index(feature)]
+        severity = x[self.vec.get_feature_names().index('bug_severity')]
 
         matching_rows = self.matrix[
             (((ts - days * ONE_DAY) < self.matrix[:, col]) &
              (self.matrix[:, col] < ts)) &
             (self.matrix[:, severity] == severity)
-        ]
+            ]
+        return matching_rows.shape[0]
+
+    def bugs_between_with_same_or_higher_severity(self, x, col, days):
+        ts = x[col]
+        severity = x[self.vec.get_feature_names().index('bug_severity')]
+
+        matching_rows = self.matrix[
+            (((ts - days * ONE_DAY) < self.matrix[:, col]) &
+             (self.matrix[:, col] < ts)) &
+            (self.matrix[:, severity] >= severity)
+            ]
         return matching_rows.shape[0]
 
     def bugs_within(self, func, days):
@@ -133,7 +141,8 @@ class Features:
         tmp1 = self.time_different()
         tmp4 = self.bugs_within(self.bugs_between, 7)
         tmp5 = self.bugs_within(self.bugs_between_with_same_severity, 7)
-        return np.column_stack((tmp1, tmp4, tmp5))
+        tmp6 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, 7)
+        return np.column_stack((tmp1, tmp4, tmp5, tmp6))
 
 if __name__ == '__main__':
     f = Features()

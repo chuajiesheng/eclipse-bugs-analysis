@@ -10,6 +10,15 @@ cachedStopWords = stopwords.words("english")
 
 
 class Bug(object):
+    SEVERITY_LIST = [
+        'enhancement',
+        'trivial',
+        'minor',
+        'normal',
+        'major',
+        'critical',
+        'blocker',
+    ]
 
     bug_id = None
     error = False
@@ -135,7 +144,7 @@ class Bug(object):
             'bug_status': self.bug_status,
             'resolution': self.resolution,
             'priority': int(self.priority[1:]),
-            'bug_severity': self.bug_severity,
+            'bug_severity': self.SEVERITY_LIST.index(self.bug_severity),
             'target_milestone': self.target_milestone,
             'everconfirmed': self.everconfirmed,
             'reporter': self.reporter,
