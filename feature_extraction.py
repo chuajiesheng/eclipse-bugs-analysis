@@ -212,6 +212,10 @@ class Features:
         ts = x[col]
         priority_col = self.vec.get_feature_names().index('priority')
         matching_rows = self.matrix[(self.matrix[:, col] < ts)]
+
+        if matching_rows.shape[0] == 0:
+            return 0
+
         return np.nan_to_num(np.mean(matching_rows[:, priority_col]))
 
     def generate_author_factor(self):
