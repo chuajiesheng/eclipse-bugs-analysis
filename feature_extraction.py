@@ -139,10 +139,36 @@ class Features:
 
     def generate_temporal_factor(self):
         tmp1 = self.time_different()
-        tmp4 = self.bugs_within(self.bugs_between, 7)
-        tmp5 = self.bugs_within(self.bugs_between_with_same_severity, 7)
-        tmp6 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, 7)
-        return np.column_stack((tmp1, tmp4, tmp5, tmp6))
+
+        reported_within = 7
+
+        tmp4 = self.bugs_within(self.bugs_between, reported_within)
+        tmp5 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
+        tmp6 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+
+        reported_within = 30
+
+        tmp7 = self.bugs_within(self.bugs_between, reported_within)
+        tmp8 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
+        tmp9 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+
+        reported_within = 1
+
+        tmp10 = self.bugs_within(self.bugs_between, reported_within)
+        tmp11 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
+        tmp12 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+
+        reported_within = 3
+
+        tmp13 = self.bugs_within(self.bugs_between, reported_within)
+        tmp14 = self.bugs_within(self.bugs_between_with_same_severity, reported_within)
+        tmp15 = self.bugs_within(self.bugs_between_with_same_or_higher_severity, reported_within)
+
+        return np.column_stack((tmp1,
+                                tmp4, tmp5, tmp6,
+                                tmp7, tmp8, tmp9,
+                                tmp10, tmp11, tmp12,
+                                tmp13, tmp14, tmp15))
 
 if __name__ == '__main__':
     f = Features()
@@ -150,7 +176,7 @@ if __name__ == '__main__':
     # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
     f1 = f.generate_temporal_factor()
 
-    code.interact(local=locals())
+    # code.interact(local=locals())
 
     priority_index = f.vec.get_feature_names().index('priority')
     target = np.squeeze(f.matrix[:, priority_index])
