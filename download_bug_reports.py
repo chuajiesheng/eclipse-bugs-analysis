@@ -1,5 +1,6 @@
 import urllib2
 import sys
+import time
 
 START = 193701
 STOP = 491000
@@ -26,3 +27,5 @@ for i in range(START, STOP, STEP):
 
     sys.stdout.write('.')
     sys.stdout.flush()
+
+    time.sleep(5)
