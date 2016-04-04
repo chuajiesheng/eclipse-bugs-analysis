@@ -2,8 +2,8 @@ import urllib2
 import sys
 
 START = 193701
-# STOP = 491000
-STOP = 194000
+STOP = 491000
+# STOP = 194000
 STEP = 100
 
 URL = 'https://bugs.eclipse.org/bugs/show_bug.cgi'
