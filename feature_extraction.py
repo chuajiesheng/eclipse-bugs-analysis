@@ -26,18 +26,22 @@ class NodeUtil:
 
 
 class Features:
+    bugs = None
     vec = None
     matrix = None
 
     def __init__(self):
+        self.bugs = None
         self.vec = None
         self.matrix = None
 
     def read_into_memory(self):
         files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
-        files = ['bugs000001-000100.xml']
-        bugs = self.read_files(files)
-        measurements = self.generate_dicts(bugs)
+        files = ['bugs000001-000100.xml', 'bugs000101-000200.xml',
+                 'bugs000201-000300.xml', 'bugs000301-000400.xml']
+        self.bugs = self.read_files(files)
+        measurements = self.generate_dicts(self.bugs)
+
         self.vec = DictVectorizer()
         self.matrix = self.vec.fit_transform(measurements)
         self.matrix[np.isnan(self.matrix.todense())] = 0
