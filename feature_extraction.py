@@ -213,8 +213,8 @@ class Features:
         ts = x[ts_col]
 
         pri_feature_name = [f for f in self.vec.get_feature_names()
-                          if (pri_col in f) and
-                          (x[self.vec.get_feature_names().index(f)] == 1)][0]
+                            if (pri_col in f) and
+                            (x[self.vec.get_feature_names().index(f)] == 1)][0]
         assert pri_feature_name is not None
         pri_feature = self.vec.get_feature_names().index(pri_feature_name)
 
@@ -230,8 +230,8 @@ class Features:
         ts = x[ts_col]
 
         pri_feature_name = [f for f in self.vec.get_feature_names()
-                          if (pri_col in f) and
-                          (x[self.vec.get_feature_names().index(f)] == 1)][0]
+                            if (pri_col in f) and
+                            (x[self.vec.get_feature_names().index(f)] == 1)][0]
         assert pri_feature_name is not None
         pri_feature = self.vec.get_feature_names().index(pri_feature_name)
 
@@ -247,8 +247,8 @@ class Features:
         ts = x[ts_col]
 
         pri_feature_name = [f for f in self.vec.get_feature_names()
-                          if (pri_col in f) and
-                          (x[self.vec.get_feature_names().index(f)] == 1)][0]
+                            if (pri_col in f) and
+                            (x[self.vec.get_feature_names().index(f)] == 1)][0]
         assert pri_feature_name is not None
         pri_feature = self.vec.get_feature_names().index(pri_feature_name)
 
@@ -313,6 +313,32 @@ class Features:
 
         return report_factor
 
+    def no_of_bugs_with_same_severity_prior(self, x, ts_col, pri_col):
+        ts = x[ts_col]
+        severity = x[self.vec.get_feature_names().index('bug_severity')]
+
+        pri_feature_name = [f for f in self.vec.get_feature_names()
+                            if (pri_col in f) and
+                            (x[self.vec.get_feature_names().index(f)] == 1)][0]
+        assert pri_feature_name is not None
+        pri_feature = self.vec.get_feature_names().index(pri_feature_name)
+
+        matching_rows = self.matrix[
+            ((self.matrix[:, pri_feature] == 1) &
+             (self.matrix[:, ts_col] < ts)) &
+            (self.matrix[:, severity] == severity)
+            ]
+        return matching_rows.shape[0]
+
+    def generate_product_factor(self):
+        pro2 = self.apply_over('creation_ts', self.no_of_bugs_prior, 'product')
+        pro2 = pro2.reshape(pro2.shape[0], 1)
+
+        pro3 = self.apply_over('creation_ts', self.no_of_bugs_with_same_severity_prior, 'product')
+        pro3 = pro3.reshape(pro2.shape[0], 1)
+
+        product_factor = np.column_stack((pro2, pro3))
+        return product_factor
 
 if __name__ == '__main__':
     f = Features()
@@ -321,6 +347,7 @@ if __name__ == '__main__':
     f1 = f.generate_temporal_factor()
     f2 = f.generate_author_factor()
     f3 = f.generate_report_factor()
+    f4 = f.generate_product_factor()
 
     # code.interact(local=locals())
 
