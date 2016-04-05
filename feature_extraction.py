@@ -236,7 +236,10 @@ class Features:
         pri_feature = self.vec.get_feature_names().index(pri_feature_name)
 
         priority_col = self.vec.get_feature_names().index('priority')
-        matching_rows = self.matrix[(self.matrix[:, pri_feature] == 1) & (self.matrix[:, ts_col] < ts)]
+        matching_rows = self.matrix[
+            (self.matrix[:, pri_feature] == 1) &
+            (self.matrix[:, ts_col] < ts)
+        ]
 
         if matching_rows.shape[0] == 0:
             return 0
@@ -390,22 +393,51 @@ class Features:
         pro5 = self.apply_over('creation_ts', self.distribution_of_bugs_prior, 'product')
         assert pro5.shape == (self.matrix.shape[0], 5)
 
-        product_factor = np.column_stack((pro2, pro3, pro4, pro5))
-        return product_factor
+        pro10 = self.apply_over('creation_ts', self.mean_priority_of_bugs_prior, 'product')
+        assert pro10.shape == (self.matrix.shape[0],)
+
+        pro11 = self.apply_over('creation_ts', self.median_priority_of_bugs_prior, 'product')
+        assert pro11.shape == (self.matrix.shape[0],)
+
+        # component factor
+        pro12 = self.apply_over('creation_ts', self.no_of_bugs_prior, 'component')
+        pro12 = pro12.reshape(pro12.shape[0], 1)
+        assert pro12.shape == (self.matrix.shape[0], 1)
+
+        pro13 = self.apply_over('creation_ts', self.no_of_bugs_with_same_severity_prior, 'component')
+        pro13 = pro13.reshape(pro13.shape[0], 1)
+        assert pro13.shape == (self.matrix.shape[0], 1)
+
+        pro14 = self.apply_over('creation_ts', self.no_of_bugs_with_same_or_higher_severity_prior, 'component')
+        pro14 = pro14.reshape(pro14.shape[0], 1)
+        assert pro14.shape == (self.matrix.shape[0], 1)
+
+        pro15 = self.apply_over('creation_ts', self.distribution_of_bugs_prior, 'component')
+        assert pro15.shape == (self.matrix.shape[0], 5)
+
+        pro20 = self.apply_over('creation_ts', self.mean_priority_of_bugs_prior, 'component')
+        assert pro20.shape == (self.matrix.shape[0],)
+
+        pro21 = self.apply_over('creation_ts', self.median_priority_of_bugs_prior, 'component')
+        assert pro21.shape == (self.matrix.shape[0],)
+
+        product_factor = np.column_stack((pro2, pro3, pro4, pro5, pro10, pro11))
+        assert product_factor.shape == (self.matrix.shape[0], 10)
+        component_factor = np.column_stack((pro12, pro13, pro14, pro15, pro20, pro21))
+        assert component_factor.shape == (self.matrix.shape[0], 10)
+
+        return np.column_stack((product_factor, component_factor))
 
 if __name__ == '__main__':
     f = Features()
     f.read_into_memory()
-    # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
     f1 = f.generate_temporal_factor()
     f2 = f.generate_author_factor()
     f3 = f.generate_report_factor()
     f4 = f.generate_product_factor()
 
-    # code.interact(local=locals())
-
     priority_index = f.vec.get_feature_names().index('priority')
     target = np.squeeze(f.matrix[:, priority_index])
-    training = np.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:]])
+    training = np.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:], f1, f2, f3, f4])
 
     sklearn.datasets.dump_svmlight_file(training, target, 'run/training.dat', zero_based=False, multilabel=False)
