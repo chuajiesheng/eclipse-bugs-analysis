@@ -330,6 +330,23 @@ class Features:
             ]
         return matching_rows.shape[0]
 
+    def no_of_bugs_with_same_or_higher_severity_prior(self, x, ts_col, pri_col):
+        ts = x[ts_col]
+        severity = x[self.vec.get_feature_names().index('bug_severity')]
+
+        pri_feature_name = [f for f in self.vec.get_feature_names()
+                            if (pri_col in f) and
+                            (x[self.vec.get_feature_names().index(f)] == 1)][0]
+        assert pri_feature_name is not None
+        pri_feature = self.vec.get_feature_names().index(pri_feature_name)
+
+        matching_rows = self.matrix[
+            ((self.matrix[:, pri_feature] == 1) &
+             (self.matrix[:, ts_col] < ts)) &
+            (self.matrix[:, severity] >= severity)
+            ]
+        return matching_rows.shape[0]
+
     def generate_product_factor(self):
         pro2 = self.apply_over('creation_ts', self.no_of_bugs_prior, 'product')
         pro2 = pro2.reshape(pro2.shape[0], 1)
@@ -337,7 +354,10 @@ class Features:
         pro3 = self.apply_over('creation_ts', self.no_of_bugs_with_same_severity_prior, 'product')
         pro3 = pro3.reshape(pro2.shape[0], 1)
 
-        product_factor = np.column_stack((pro2, pro3))
+        pro4 = self.apply_over('creation_ts', self.no_of_bugs_with_same_or_higher_severity_prior, 'product')
+        pro4 = pro4.reshape(pro2.shape[0], 1)
+
+        product_factor = np.column_stack((pro2, pro3, pro4))
         return product_factor
 
 if __name__ == '__main__':
