@@ -153,13 +153,12 @@ class Bug(object):
             'assigned_to': self.assigned_to,
             'qa_contact': self.qa_contact
         }
-
-        short_desc = self.generate_array_dict('short_desc', self.short_desc)
+        
         blocked = self.generate_array_dict('blocked', self.blocked)
         dependson = self.generate_array_dict('dependson', self.dependson)
         cc = self.generate_array_dict('cc', self.cc)
 
-        return self.merge_dicts(base, short_desc, blocked, dependson, cc)
+        return self.merge_dicts(base, blocked, dependson, cc)
 
     def short_desc_without_stop_words(self):
         return [word for word in self.short_desc if word not in stopwords.words('english')]
