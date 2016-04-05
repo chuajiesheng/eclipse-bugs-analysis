@@ -212,14 +212,14 @@ class Features:
     def median_priority_of_bugs_prior(self, x, ts_col, pri_col):
         ts = x[ts_col]
 
-        author_feature = [f for f in self.vec.get_feature_names()
+        pri_feature_name = [f for f in self.vec.get_feature_names()
                           if (pri_col in f) and
                           (x[self.vec.get_feature_names().index(f)] == 1)][0]
-        assert author_feature is not None
-        author_col = self.vec.get_feature_names().index(author_feature)
+        assert pri_feature_name is not None
+        pri_feature = self.vec.get_feature_names().index(pri_feature_name)
 
         priority_col = self.vec.get_feature_names().index('priority')
-        matching_rows = self.matrix[(self.matrix[:, author_col] == 1) & (self.matrix[:, ts_col] < ts)]
+        matching_rows = self.matrix[(self.matrix[:, pri_feature] == 1) & (self.matrix[:, ts_col] < ts)]
 
         if matching_rows.shape[0] == 0:
             return 0
@@ -229,14 +229,14 @@ class Features:
     def mean_priority_of_bugs_prior(self, x, ts_col, pri_col):
         ts = x[ts_col]
 
-        author_feature = [f for f in self.vec.get_feature_names()
+        pri_feature_name = [f for f in self.vec.get_feature_names()
                           if (pri_col in f) and
                           (x[self.vec.get_feature_names().index(f)] == 1)][0]
-        assert author_feature is not None
-        author_col = self.vec.get_feature_names().index(author_feature)
+        assert pri_feature_name is not None
+        pri_feature = self.vec.get_feature_names().index(pri_feature_name)
 
         priority_col = self.vec.get_feature_names().index('priority')
-        matching_rows = self.matrix[(self.matrix[:, author_col] == 1) & (self.matrix[:, ts_col] < ts)]
+        matching_rows = self.matrix[(self.matrix[:, pri_feature] == 1) & (self.matrix[:, ts_col] < ts)]
 
         if matching_rows.shape[0] == 0:
             return 0
@@ -246,13 +246,13 @@ class Features:
     def no_of_bugs_prior(self, x, ts_col, pri_col):
         ts = x[ts_col]
 
-        author_feature = [f for f in self.vec.get_feature_names()
+        pri_feature_name = [f for f in self.vec.get_feature_names()
                           if (pri_col in f) and
                           (x[self.vec.get_feature_names().index(f)] == 1)][0]
-        assert author_feature is not None
-        author_col = self.vec.get_feature_names().index(author_feature)
+        assert pri_feature_name is not None
+        pri_feature = self.vec.get_feature_names().index(pri_feature_name)
 
-        matching_rows = self.matrix[(self.matrix[:, author_col] == 1) & (self.matrix[:, ts_col] < ts)]
+        matching_rows = self.matrix[(self.matrix[:, pri_feature] == 1) & (self.matrix[:, ts_col] < ts)]
         return matching_rows.shape[0]
 
     def generate_author_factor(self):
