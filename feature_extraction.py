@@ -347,17 +347,50 @@ class Features:
             ]
         return matching_rows.shape[0]
 
+    def distribution_of_bugs_prior(self, x, ts_col, pri_col):
+        ts = x[ts_col]
+        priority_col = self.vec.get_feature_names().index('priority')
+
+        pri_feature_name = [f for f in self.vec.get_feature_names()
+                            if (pri_col in f) and
+                            (x[self.vec.get_feature_names().index(f)] == 1)][0]
+        assert pri_feature_name is not None
+        pri_feature = self.vec.get_feature_names().index(pri_feature_name)
+
+        matching_rows = self.matrix[
+            ((self.matrix[:, pri_feature] == 1) &
+             (self.matrix[:, ts_col] < ts))
+            ]
+
+        if matching_rows.shape[0] == 0:
+            return np.array([0, 0, 0, 0, 0])
+        assert matching_rows.shape[0] > 0
+
+        return np.array([
+            (matching_rows[:, priority_col] == 1).sum(),
+            (matching_rows[:, priority_col] == 2).sum(),
+            (matching_rows[:, priority_col] == 3).sum(),
+            (matching_rows[:, priority_col] == 4).sum(),
+            (matching_rows[:, priority_col] == 5).sum()
+        ])
+
     def generate_product_factor(self):
         pro2 = self.apply_over('creation_ts', self.no_of_bugs_prior, 'product')
         pro2 = pro2.reshape(pro2.shape[0], 1)
+        assert pro2.shape[0] == self.matrix.shape[0]
 
         pro3 = self.apply_over('creation_ts', self.no_of_bugs_with_same_severity_prior, 'product')
-        pro3 = pro3.reshape(pro2.shape[0], 1)
+        pro3 = pro3.reshape(pro3.shape[0], 1)
+        assert pro3.shape[0] == self.matrix.shape[0]
 
         pro4 = self.apply_over('creation_ts', self.no_of_bugs_with_same_or_higher_severity_prior, 'product')
-        pro4 = pro4.reshape(pro2.shape[0], 1)
+        pro4 = pro4.reshape(pro4.shape[0], 1)
+        assert pro4.shape[0] == self.matrix.shape[0]
 
-        product_factor = np.column_stack((pro2, pro3, pro4))
+        pro5 = self.apply_over('creation_ts', self.distribution_of_bugs_prior, 'product')
+        assert pro5.shape == (self.matrix.shape[0], 5)
+
+        product_factor = np.column_stack((pro2, pro3, pro4, pro5))
         return product_factor
 
 if __name__ == '__main__':
