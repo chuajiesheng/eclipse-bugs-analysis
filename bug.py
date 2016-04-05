@@ -5,6 +5,7 @@ from long_desc import LongDesc
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 import time
+import code
 
 cachedStopWords = stopwords.words("english")
 
@@ -159,6 +160,13 @@ class Bug(object):
         cc = self.generate_array_dict('cc', self.cc)
 
         return self.merge_dicts(base, short_desc, blocked, dependson, cc)
+
+    def short_desc_without_stop_words(self):
+        return [word for word in self.short_desc if word not in stopwords.words('english')]
+
+    def to_short_desc(self):
+        words = self.short_desc_without_stop_words()
+        return '{},{}'.format(self.priority, ' '.join(words))
 
     @staticmethod
     def generate_array_dict(key, l):

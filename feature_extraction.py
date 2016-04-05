@@ -5,6 +5,8 @@ from xml import parsers
 import bug
 import sys
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import scipy
 import sklearn
 import numpy as np
@@ -241,6 +243,50 @@ class Features:
 
         return np.concatenate((author_factor, aut3, aut4, aut5), axis=1)
 
+    def generate_report_factor(self):
+        documents = [item.to_short_desc() for item in self.bugs]
+        assert len(documents) == self.matrix.shape[0]
+        tfidf_vectorizer = TfidfVectorizer()
+        tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+        cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix)
+        cosine_similarities = np.argsort(cosine_similarities, axis=1)
+        
+        priorities = np.array([int(b.priority[1:]) for b in self.bugs])
+        assert len(documents) == priorities.shape[0]
+
+        related_docs_matrix = cosine_similarities.argsort()[::-1][:, :20]
+        assert related_docs_matrix.shape[1] == 20
+
+        res = priorities[related_docs_matrix]
+        assert res.shape[1] == 20
+        rep3 = np.mean(res, axis=1)
+        rep4 = np.median(res, axis=1)
+
+        res = res[:, :10]
+        assert res.shape[1] == 10
+        rep5 = np.mean(res, axis=1)
+        rep6 = np.median(res, axis=1)
+
+        res = res[:, :5]
+        assert res.shape[1] == 5
+        rep7 = np.mean(res, axis=1)
+        rep8 = np.median(res, axis=1)
+
+        res = res[:, :3]
+        assert res.shape[1] == 3
+        rep9 = np.mean(res, axis=1)
+        rep10 = np.median(res, axis=1)
+
+        res = res[:, :1]
+        assert res.shape[1] == 1
+        rep11 = np.mean(res, axis=1)
+        rep12 = np.median(res, axis=1)
+
+        report_factor = np.column_stack((rep3, rep4, rep5, rep6, rep7, rep8, rep9, rep10, rep11, rep12))
+        assert report_factor.shape == (self.matrix.shape[0], 10)
+        
+        return report_factor
+
 
 if __name__ == '__main__':
     f = Features()
@@ -248,6 +294,7 @@ if __name__ == '__main__':
     # f.row_op('priority', (lambda x, y: x == y), 3.0, np.average, 'priority')
     f1 = f.generate_temporal_factor()
     f2 = f.generate_author_factor()
+    f3 = f.generate_report_factor()
 
     # code.interact(local=locals())
 
