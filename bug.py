@@ -133,7 +133,6 @@ class Bug(object):
         base = {
             'creation_ts': time.mktime(self.creation_ts.timetuple()),
             'delta_ts': time.mktime(self.delta_ts.timetuple()),
-            'cclist_accessible': self.cclist_accessible,
             'classification_id': self.classification_id,
             'classification': self.classification,
             'product': self.product,
@@ -141,13 +140,11 @@ class Bug(object):
             'version': self.version,
             'rep_platform': self.rep_platform,
             'op_sys': self.op_sys,
-            'bug_status': self.bug_status,
             'resolution': self.resolution,
             'priority': int(self.priority[1:]),
             'bug_severity': self.SEVERITY_LIST.index(self.bug_severity),
             'severity': self.bug_severity,
             'target_milestone': self.target_milestone,
-            'everconfirmed': self.everconfirmed,
             'reporter': self.reporter,
             'assigned_to': self.assigned_to,
             'qa_contact': self.qa_contact
