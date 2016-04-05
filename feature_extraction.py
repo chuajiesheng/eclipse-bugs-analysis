@@ -377,15 +377,15 @@ class Features:
     def generate_product_factor(self):
         pro2 = self.apply_over('creation_ts', self.no_of_bugs_prior, 'product')
         pro2 = pro2.reshape(pro2.shape[0], 1)
-        assert pro2.shape[0] == self.matrix.shape[0]
+        assert pro2.shape == (self.matrix.shape[0], 1)
 
         pro3 = self.apply_over('creation_ts', self.no_of_bugs_with_same_severity_prior, 'product')
         pro3 = pro3.reshape(pro3.shape[0], 1)
-        assert pro3.shape[0] == self.matrix.shape[0]
+        assert pro3.shape == (self.matrix.shape[0], 1)
 
         pro4 = self.apply_over('creation_ts', self.no_of_bugs_with_same_or_higher_severity_prior, 'product')
         pro4 = pro4.reshape(pro4.shape[0], 1)
-        assert pro4.shape[0] == self.matrix.shape[0]
+        assert pro4.shape == (self.matrix.shape[0], 1)
 
         pro5 = self.apply_over('creation_ts', self.distribution_of_bugs_prior, 'product')
         assert pro5.shape == (self.matrix.shape[0], 5)
