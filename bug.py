@@ -152,7 +152,7 @@ class Bug(object):
             'assigned_to': self.assigned_to,
             'qa_contact': self.qa_contact
         }
-        
+
         blocked = self.generate_array_dict('blocked', self.blocked)
         dependson = self.generate_array_dict('dependson', self.dependson)
         cc = self.generate_array_dict('cc', self.cc)

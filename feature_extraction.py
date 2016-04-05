@@ -209,37 +209,63 @@ class Features:
             author_factor[applicable_rows, 1] = median_priority
         return author_factor
 
-    def bugs_prior(self, x, col, opt):
+    def median_priority_of_bugs_prior(self, x, col, opt):
         ts = x[col]
-        matching_rows = self.matrix[(self.matrix[:, col] < ts)]
-        return matching_rows.shape[0]
 
-    def mean_priority_of_bugs_prior(self, x, col, opt):
-        ts = x[col]
+        author_feature = [f for f in self.vec.get_feature_names()
+                          if ('reporter' in f) and
+                          (x[self.vec.get_feature_names().index(f)] == 1)][0]
+        assert author_feature is not None
+        author_col = self.vec.get_feature_names().index(author_feature)
+
         priority_col = self.vec.get_feature_names().index('priority')
-        matching_rows = self.matrix[(self.matrix[:, col] < ts)]
+        matching_rows = self.matrix[(self.matrix[:, author_col] == 1) & (self.matrix[:, col] < ts)]
 
         if matching_rows.shape[0] == 0:
             return 0
 
-        return np.nan_to_num(np.mean(matching_rows[:, priority_col]))
+        return np.mean(matching_rows[:, priority_col])
+
+    def mean_priority_of_bugs_prior(self, x, col, opt):
+        ts = x[col]
+
+        author_feature = [f for f in self.vec.get_feature_names()
+                          if ('reporter' in f) and
+                          (x[self.vec.get_feature_names().index(f)] == 1)][0]
+        assert author_feature is not None
+        author_col = self.vec.get_feature_names().index(author_feature)
+
+        priority_col = self.vec.get_feature_names().index('priority')
+        matching_rows = self.matrix[(self.matrix[:, author_col] == 1) & (self.matrix[:, col] < ts)]
+
+        if matching_rows.shape[0] == 0:
+            return 0
+
+        return np.nan_to_num(np.median(matching_rows[:, priority_col]))
 
     def no_of_bugs_prior(self, x, col, opt):
         ts = x[col]
-        matching_rows = self.matrix[(self.matrix[:, col] < ts)]
+
+        author_feature = [f for f in self.vec.get_feature_names()
+                          if ('reporter' in f) and
+                          (x[self.vec.get_feature_names().index(f)] == 1)][0]
+        assert author_feature is not None
+        author_col = self.vec.get_feature_names().index(author_feature)
+
+        matching_rows = self.matrix[(self.matrix[:, author_col] == 1) & (self.matrix[:, col] < ts)]
         return matching_rows.shape[0]
 
     def generate_author_factor(self):
         author_factor = self.bugs_reported_by_author().toarray()
 
-        aut3 = self.apply_over('creation_ts', self.bugs_prior, None)
+        aut3 = self.apply_over('creation_ts', self.mean_priority_of_bugs_prior, None)
         aut3 = aut3.reshape(aut3.shape[0], 1)
 
-        aut4 = self.apply_over('creation_ts', self.mean_priority_of_bugs_prior, None)
-        aut4 = aut4.reshape(aut4.shape[0], 1)
+        aut4 = self.apply_over('creation_ts', self.median_priority_of_bugs_prior, None)
+        aut4 = aut3.reshape(aut4.shape[0], 1)
 
         aut5 = self.apply_over('creation_ts', self.no_of_bugs_prior, None)
-        aut5 = aut4.reshape(aut5.shape[0], 1)
+        aut5 = aut5.reshape(aut5.shape[0], 1)
 
         return np.concatenate((author_factor, aut3, aut4, aut5), axis=1)
 
