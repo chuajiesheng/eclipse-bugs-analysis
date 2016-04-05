@@ -133,7 +133,6 @@ class Bug(object):
         base = {
             'creation_ts': time.mktime(self.creation_ts.timetuple()),
             'delta_ts': time.mktime(self.delta_ts.timetuple()),
-            'reporter_accessible': self.reporter_accessible,
             'cclist_accessible': self.cclist_accessible,
             'classification_id': self.classification_id,
             'classification': self.classification,
