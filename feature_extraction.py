@@ -275,6 +275,11 @@ def generate_stats(bugs):
     for b in bugs:
         priorities[b.priority] += 1
 
+    output_file = open('run/all_bugs_stats.txt', 'w')
+    output_file.write(str(priorities))
+    output_file.write('\n')
+    output_file.close()
+
     print priorities
 
 if __name__ == '__main__':
