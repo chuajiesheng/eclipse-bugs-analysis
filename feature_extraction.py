@@ -52,7 +52,7 @@ def multithread_parse_file(file_path):
 
 
 def compute_feature(all_bugs, features, row, current_bug, bug_severity_list, tfidf_matrix):
-    col_index = 0
+    col_index = 1
 
     features[row, col_index] = current_bug.num_of_comments(5)
     col_index += 1
