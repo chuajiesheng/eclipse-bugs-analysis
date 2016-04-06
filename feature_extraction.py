@@ -41,7 +41,7 @@ class Features:
         files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
         # files = ['bugs000001-000100.xml', 'bugs000101-000200.xml',
         #          'bugs000201-000300.xml', 'bugs000301-000400.xml']
-        self.bugs = self.read_files(files)
+        self.bugs = sorted(self.read_files(files))
         measurements = self.generate_dicts(self.bugs)
 
         self.vec = DictVectorizer()
