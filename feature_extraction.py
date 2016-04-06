@@ -275,7 +275,7 @@ if __name__ == '__main__':
     print 'parse completed'
 
     start = 0
-    step = 20000
+    step = 15000
     end = len(bugs)
 
     p = None
