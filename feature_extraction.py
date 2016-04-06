@@ -11,6 +11,7 @@ import scipy
 import sklearn
 import numpy as np
 from sklearn.preprocessing import normalize
+from sets import Set
 import code
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
@@ -429,9 +430,61 @@ class Features:
 
         return np.column_stack((product_factor, component_factor))
 
+    @staticmethod
+    def generate_stats(bugs):
+        priorities = {
+            'P1': 0,
+            'P2': 0,
+            'P3': 0,
+            'P4': 0,
+            'P5': 0,
+        }
+
+        for b in bugs:
+            priorities[b.priority] += 1
+
+        output_file = open('run/all_bugs_stats.txt', 'w')
+        output_file.write(str(priorities))
+        output_file.write('\n')
+        output_file.close()
+
+        print priorities
+
+    @staticmethod
+    def get_all_assigned_to(bugs):
+        s = Set()
+
+        for b in bugs:
+            person = b.assigned_to
+            if person is not None:
+                s.add(person)
+
+        return sorted(list(s))
+
+    @staticmethod
+    def generate_assigned_to(people):
+        with open('run/assigned_to_people_index.txt', 'w') as f:
+            for i, v in enumerate(people):
+                index = i + 1
+                f.write('{}, {}\n'.format(str(index), v))
+
+    @staticmethod
+    def generate_bugs_assigned_to(people, bugs):
+        with open('run/bugs_assigned_to.txt', 'w') as f:
+            for i, b in enumerate(bugs):
+                b_index = i + 1
+                v_index = people.index(b.assigned_to)
+                f.write('{}, {}\n'.format(str(b_index), str(v_index)))
+
 if __name__ == '__main__':
     f = Features()
     f.read_into_memory()
+
+    f.generate_stats(f.bugs)
+    all_assigned_to_users = f.get_all_assigned_to(f.bugs)
+    f.generate_assigned_to(all_assigned_to_users)
+    f.generate_bugs_assigned_to(all_assigned_to_users, f.bugs)
+
     f1 = f.generate_temporal_factor()
     f2 = f.generate_author_factor()
     f3 = f.generate_report_factor()
