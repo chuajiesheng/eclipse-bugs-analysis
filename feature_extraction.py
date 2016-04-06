@@ -430,8 +430,7 @@ class Features:
 
         return np.column_stack((product_factor, component_factor))
 
-    @staticmethod
-    def generate_stats(bugs):
+    def generate_stats(self):
         priorities = {
             'P1': 0,
             'P2': 0,
@@ -440,7 +439,7 @@ class Features:
             'P5': 0,
         }
 
-        for b in bugs:
+        for b in self.bugs:
             priorities[b.priority] += 1
 
         output_file = open('run/all_bugs_stats.txt', 'w')
@@ -450,11 +449,10 @@ class Features:
 
         print priorities
 
-    @staticmethod
-    def get_all_assigned_to(bugs):
+    def get_all_assigned_to(self):
         s = Set()
 
-        for b in bugs:
+        for b in self.bugs:
             person = b.assigned_to
             if person is not None:
                 s.add(person)
@@ -468,10 +466,9 @@ class Features:
                 index = i + 1
                 f.write('{}, {}\n'.format(str(index), v))
 
-    @staticmethod
-    def generate_bugs_assigned_to(people, bugs):
+    def generate_bugs_assigned_to(self, people):
         with open('run/bugs_assigned_to.txt', 'w') as f:
-            for i, b in enumerate(bugs):
+            for i, b in enumerate(self.bugs):
                 b_index = i + 1
                 v_index = people.index(b.assigned_to)
                 f.write('{}, {}\n'.format(str(b_index), str(v_index)))
@@ -480,10 +477,10 @@ if __name__ == '__main__':
     f = Features()
     f.read_into_memory()
 
-    f.generate_stats(f.bugs)
-    all_assigned_to_users = f.get_all_assigned_to(f.bugs)
+    f.generate_stats()
+    all_assigned_to_users = f.get_all_assigned_to()
     f.generate_assigned_to(all_assigned_to_users)
-    f.generate_bugs_assigned_to(all_assigned_to_users, f.bugs)
+    f.generate_bugs_assigned_to(all_assigned_to_users)
 
     f1 = f.generate_temporal_factor()
     f2 = f.generate_author_factor()
