@@ -3,6 +3,7 @@ from os.path import isfile, join
 from xml.dom import minidom
 from xml import parsers
 from multiprocessing import Process
+import threading
 import bug
 import sys
 import numpy as np
