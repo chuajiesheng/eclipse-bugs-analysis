@@ -11,6 +11,7 @@ import scipy.sparse as sps
 import code
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sets import Set
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
 run_id = '20160320-0057'
@@ -282,6 +283,32 @@ def generate_stats(bugs):
 
     print priorities
 
+
+def get_all_assigned_to(bugs):
+    s = Set()
+
+    for b in bugs:
+        person = b.assigned_to
+        if person is not None:
+            s.add(person)
+
+    return sorted(list(s))
+
+
+def generate_assigned_to(people):
+    with open('run/assigned_to_people_index.txt', 'w') as f:
+        for i, v in enumerate(people):
+            index = i + 1
+            f.write('{}, {}\n'.format(str(index), v))
+
+
+def generate_bugs_assigned_to(people, bugs):
+    with open('run/bugs_assigned_to.txt', 'w') as f:
+        for i, b in enumerate(bugs):
+            b_index = i + 1
+            v_index = people.index(b.assigned_to)
+            f.write('{}, {}\n'.format(str(b_index), str(v_index)))
+
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
     # files = ['bugs000001-000100.xml']
@@ -296,6 +323,10 @@ if __name__ == '__main__':
 
     generate_stats(bugs)
     print 'stats generated'
+
+    all_assigned_to_users = get_all_assigned_to(bugs)
+    generate_assigned_to(all_assigned_to_users)
+    generate_bugs_assigned_to(all_assigned_to_users, bugs)
 
     start = 0
     step = 15000
