@@ -263,6 +263,20 @@ def process_feature(start, end):
     print 'run {}\t{} to\t{}\tcompleted'.format(run_id, start, end)
 
 
+def generate_stats(bugs):
+    priorities = {
+        'P1': 0,
+        'P2': 0,
+        'P3': 0,
+        'P4': 0,
+        'P5': 0,
+    }
+
+    for b in bugs:
+        priorities[b.priority] += 1
+
+    print priorities
+
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
     # files = ['bugs000001-000100.xml']
@@ -274,6 +288,9 @@ if __name__ == '__main__':
         parse_file(file_path)
 
     print 'parse completed'
+
+    generate_stats(bugs)
+    print 'stats generated'
 
     start = 0
     step = 15000
