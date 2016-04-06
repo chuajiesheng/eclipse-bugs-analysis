@@ -10,6 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import scipy
 import sklearn
 import numpy as np
+from sklearn.preprocessing import normalize
 import code
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
@@ -439,5 +440,6 @@ if __name__ == '__main__':
     priority_index = f.vec.get_feature_names().index('priority')
     target = np.squeeze(f.matrix[:, priority_index])
     training = np.hstack([f.matrix[:, :priority_index], f.matrix[:, priority_index + 1:], f1, f2, f3, f4])
+    normalize(training, axis=0, copy=False)
 
     sklearn.datasets.dump_svmlight_file(training, target, 'run/training.dat', zero_based=False, multilabel=False)
