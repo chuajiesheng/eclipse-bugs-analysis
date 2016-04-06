@@ -265,6 +265,8 @@ def process_feature(start, end):
 if __name__ == '__main__':
     files = [f for f in listdir(DATA_DIRECTORY) if isfile(join(DATA_DIRECTORY, f))]
     # files = ['bugs000001-000100.xml']
+    files = sorted(files)
+
     for f in files:
         print 'read', f
         file_path = join(DATA_DIRECTORY, f)
