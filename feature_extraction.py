@@ -234,6 +234,8 @@ def compute_feature(all_bugs, features, row, current_bug, bug_severity_list, tfi
     features[row, col_index] = current_bug.median_priority_of_bug_for_same_component_prior(all_bugs)
     col_index += 1
 
+    print 'total feature', col_index
+
 
 def process_feature(start, end):
     print 'process_feature', start, 'to', end
