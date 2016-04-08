@@ -259,7 +259,8 @@ def process_feature(start, end):
 
         output_file.write('{} '.format(bugs[i].translated_priority()))
         for j in range(features.shape[1]):
-            output_file.write('{}:{} '.format(j + 1, features[i, j]))
+            if features[i, j] != 0:
+                output_file.write('{}:{} '.format(j + 1, features[i, j]))
         output_file.write('\n')
         print '\tprinted'
 
