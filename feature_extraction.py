@@ -14,7 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sets import Set
 
 DATA_DIRECTORY = 'data/huge-eclipse-xml-reports'
-run_id = '20160320-0057'
+run_id = '20160409-0013'
 bugs = []
 
 class NodeUtil:
