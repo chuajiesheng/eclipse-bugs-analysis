@@ -52,7 +52,7 @@ def multithread_parse_file(file_path):
 
 
 def compute_feature(all_bugs, features, row, current_bug, bug_severity_list, tfidf_matrix):
-    col_index = 1
+    col_index = 0
 
     features[row, col_index] = current_bug.num_of_comments(5)
     col_index += 1
@@ -259,7 +259,7 @@ def process_feature(start, end):
 
         output_file.write('{} '.format(bugs[i].translated_priority()))
         for j in range(features.shape[1]):
-            output_file.write('{}:{} '.format(j, features[i, j]))
+            output_file.write('{}:{} '.format(j + 1, features[i, j]))
         output_file.write('\n')
         print '\tprinted'
 
