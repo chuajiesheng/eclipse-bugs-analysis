@@ -7,15 +7,18 @@ This repository aims to improve the feature extraction techniques describe in th
 
 ## How the extraction is done
 
-1. Retrieve a list of XML bugs report (each contains 100 bugs)
+1. Retrieve a list of XML bugs report from the `data/huge-eclipse-xml-reports` folder (each contains 100 bugs)
 2. Parse the files and read into memory as Bug objects
 3. Generate different statistics for the data we have
    (distribution of priority, authors assigned to fix the bugs)
 4. Using a step of 15,000, we fork multiple process to extract the features
    (since the bugs have been read into memory and will not change, we can safely fork this
-5. Extract the following features:
+    1. Extract the all the features (listed in the features section)
+    2. Output the feature to `run/features_<run_id>_<start_index>to<end_index>.txt`
 
-    ##### Temporal Factor
+## Features
+
+    Temporal Factor
 
     1. number of comments (short_desc) within 5 days
     2. number of bugs reported within 7 days before the reporting of bug report
@@ -31,7 +34,7 @@ This repository aims to improve the feature extraction techniques describe in th
     12. same as 3, but for 3 days
     13. same as 4, but for 3 days
 
-    ##### Author Factor
+    Author Factor
 
     14. mean priority of bugs the author fixed
     15. median priority of bugs the author fixed
@@ -39,7 +42,7 @@ This repository aims to improve the feature extraction techniques describe in th
     17. median priority of all bug reports made by the author of bug report prior to the reporting of bug report
     18. the number of bug reports made by the author of bug report prior to the reporting of bug report
 
-    ##### Related-Report Factor
+    Related-Report Factor
 
     19. operating system (29 different operating system) (from 19 to 48 inclusive, 1 empty)
 
@@ -58,11 +61,11 @@ This repository aims to improve the feature extraction techniques describe in th
     57. mean priority of top 1 most similar document by cosine similarity and tf-idf
     58. median priority of top 1 most similar document by cosine similarity and tf-idf
 
-    ##### Severity Factor
+    Severity Factor
 
     59. severity (7 different severity) (from 59 to 66 inclusive, 1 empty)
 
-    ##### Product Factor
+    Product Factor
 
     67. product (76 different product) (from 67 to 143 inclusive, 1 empty)
     144. number of bug reports made for the same product as that of bug report prior to the reporting of bug report
@@ -76,7 +79,7 @@ This repository aims to improve the feature extraction techniques describe in th
     152. mean priority of bug reports made for the same product as that of BR prior to the reporting of BR
     153. Median priority of bug reports made for the same product as that of BR prior to the reporting of BR
 
-    ##### Component Factor
+    Component Factor
 
     154. component (487 different components) (from 154 to 641 inclusive, 1 empty)
     642. number of bug reports made for the same component as that of BR prior to the reporting of BR
